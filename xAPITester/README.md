@@ -77,19 +77,3 @@ If you require a Mac-based Voice Keyer , please see.
 (works with xSDR6000 on macOS or SmartSDR on Windows)
 
 [![W6OP](https://img.shields.io/badge/W6OP-Voice_Keyer-informational)](https://w6op.com)
-
-
-## Builds
-
-Periodically I will create a compiled RELEASE build and place it in the GitHub Releases.  
-
-If you require a DEBUG build you will have to build from sources.   
-
-
-## Comments / Questions
-
-Please report any bugs you observe to douglas.adams@me.com
-
-
-
-
