@@ -1,0 +1,242 @@
+xAPITester V2 Change Log
+
+v2.4.9.2019_07_??
+
+
+
+
+
+
+
+v2.4.9.2019_07_08
+
+ViewController.swift - added addNotifications() & code for version check
+SplitViewController.swift - updated Waterfall properties shown in view
+SplitViewController.swift - updated "id" to "streamId"
+Macros.swift - updated "id" to "streamId"
+AppDelegate.swift - updated log to include commandline params
+
+
+v2.4.9.2019_07_02
+
+xLib6000.framework - incorporated v2.4.9.2019_07_02
+reduced Deployment Target to 10.11
+
+
+v2.4.9.2019_06_21
+
+added XCGLogger & ObjcExceptionBridging frameworks
+AppDelegate.swift - conform to xSDR6000 format & log usage
+Logging throughout updated
+Defaults.plist - added clientId
+AppExtensions.swift - added clientId
+Added underscores to version for readability
+
+
+v5.2.0 10-Apr-2019
+
+xLib6000.framework - incorporated v3.0.0
+MeterViewController.swift - added the ability to filter memter table
+
+
+v5.1.20 28-Mar-2019
+
+Recompiled for Swift 5.0 - changes made as needed
+xLib6000.framework - incorporated v2.5.0
+SplitViewController.swift - minor changes to displa of meters
+Added MeterViewController - to view meters and their values
+
+
+v5.1.19 19-Feb-2019
+
+xLib6000.framework - incorporated v2.3.9
+SplitViewController.swift - color changes to support Dark Mode
+SplitViewController.swift - changes to the way Meters are displayed
+ViewController.swift - color changes to use color from Defaults
+AppExtensions.swift - color changes to support Dark Mode
+
+v5.1.18
+
+xLib6000.framework - incorporated latest version (v2.2.2)
+SplitViewController.swift - updated mhzToHz from func to var
+Macros.swift - updated mhzToHz from func to var
+
+v5.1.17
+
+ViewController.swift - corrected a bug in openRadio()
+Incorporated latest version of xLib6000 (v2.1.1 as of 8 Dec 2018)
+
+v5.1.16
+
+ViewController.swift - incorporated latest changes from xSDR6000
+Auth0ViewController.swift - incorporated latest changes from xSDR6000
+LANRadioPickerViewController.swift - incorporated latest changes from xSDR6000
+WANRadioPickerViewController.swift - incorporated latest changes from xSDR6000
+
+v5.1.15
+
+various - incorporate latest WANRadioPickerViewController, LANRadioPickerViewController & Auth0ViewController
+AppExtensions.swift - incorporate RadioParameters changes
+Main.storyboard - update Picker sheets
+ViewController.swift - incorporate RadioParameters changes
+
+v5.1.14
+
+ViewController.swift - incorporation of changes in xLib6000 to RadioParameters
+LANRadioPickerViewController.swift - incorporation of changes in xLib6000 to RadioParameters
+WANRadioPickerViewController.swift - incorporation of changes in xLib6000 to RadioParameters
+
+v5.1.13
+
+xLib6000.framework - updated to latest version 2.0.2
+WANRadioPickerViewController - added tooltip to radioTableView
+WANRadioPickerViewController - added tooltip to radioTableView
+various - using os_log instaed of delegate based logging
+
+v5.1.12
+
+SplitViewController.swift - added Tx Audio stream
+
+v5.1.11
+
+SplitViewController.swift - added gps, atu and scu info to Radio line
+
+v5.1.10
+
+SplitViewController.swift - added removeAllStreams() & logic to call it on client disconnect
+SplitViewController.swift - corrected opusStreams display in object table
+
+v5.1.9
+
+SplitViewController.swift - added Radio version into Radio object display
+xLib6000.framework - updated to latest version 1.2.4
+recompiled with Xcode 10 beta 3
+
+v5.1.8
+
+ViewController.swift - removed closeRadioPicker(), clearTable() & terminateApp() from RadioPickerDelegate protocol
+ViewController.swift - added code to openRadio(_:isWan:wanHandle:) to clear table
+ViewController.swift - removed clearTable()
+LANRadioPickerViewController.swift - modified closeButton(_:) and terminate(_:)
+LANRadioPickerViewController.swift - removed calls to clearTable()
+LANRadioPickerViewController.swift - added capture of parent view controller
+WANRadioPickerViewController - modified closeButton(_:) and terminate(_:)
+WANRadioPickerViewController - removed calls to clearTable()
+WANRadioPickerViewController - added capture of parent view controller
+
+v5.1.7
+
+Updated xLib6000.framework - changes added properties "amplifier" to Interlock
+
+v5.1.6
+
+Updated xLib6000.framework - changes added properties "band_zoom" & "segment_zoom" to Panadapter & Waterfall
+
+v5.1.5
+
+Updated xLib6000.framework - changes added properties "detached" & "nr2" to Slice
+
+v5.1.4
+
+converted to Swift 4.2
+Embeds Swift 4.2. version of xLib6000.framework & SwiftyUserDefaults.framework
+ViewController.swift - changes to conform to Swift 4.2
+HelpViewController.swift - changes to conform to Swift 4.2
+SplitViewController.swift - changes to conform to Swift 4.2
+WANRadioPickerViewController.swift - changes to conform to Swift 4.2
+
+
+v5.1.3
+
+ViewController.swift - changed logic to display versions in window title
+Main.storyboard - added "Copy Handle" button
+ViewController.swift - added code to respond to "Copy Handle" button
+SplitViewController.swift - renamed FilterTag "streamId" to "myHandle"
+SplitViewController.swift - added FilterTag "handle"
+ViewController.swift - refactored to use extensions & helper functions
+SplitViewController.swift - refactored to use extensions & helper functions
+AppExtensions.swift - removed unneeded extensions, added new functions & extensions
+
+v5.1.2
+
+AudioHandler, IqHandler, MicAudioHandler, PanadapterHandler & WaterfallHandler.swift - removed
+SplitViewController.swift - refactored redraw(), renamed to refreshObjects()
+ViewController.swift - refactored checkForDefaultRadio()
+
+v5.1.1
+
+SplitViewController.swift - refactor the objects table to make it hierarchical & updated in real-time
+All stream handlers - removed the showInObjectsTable(...) calls
+
+v5.0.16
+
+ViewController.swift - added code to evaluate conditional macros
+ViewController.swift - added code to evaluate replaceable parameters in macros
+SplitViewController.swift - additional information in slice & tnf hasBeenAdded() & willBeRemoved() methods
+
+v5.0.15
+
+Main.storyboard - reworked the UI
+ViewController.swift - added the ability to save / load / run macros (collections of commands)
+
+v5.0.14
+
+Defaults.plist - reduced minimum font size to 8
+Main.storyboard - increased Commands & Replies table width to 8000
+
+v5.0.13
+
+SplitViewController.swift - added "units" to meter display in objects table
+MicAudioHandler.swift - added
+SplitViewController.swift - added ability to display actual error text on non-zero replies
+SplitViewController.swift - corrected handling of streams (Audio, Iq, MicAudio)
+
+v5.0.12
+
+SplitViewController.swift - commented out replyHandler code
+SplitViewController.swift - multiple changes to what is displayed in the objects table
+ViewController.swift - corrected action of the C;ear button (clear both tables)
+
+v5.0.11
+
+Added xLib6000 version display to title bar
+Corrected Command+/- to change fonts on both tables
+
+v5.0.10
+
+Changes to Slice, Meter and Tnf Object table entries
+
+v5.0.9
+
+Updated xLib6000 - Meter "description" now "desc"
+added value to Meter output in Objects table
+
+v5.0.8
+
+Copied latest xLib6000 (v1.0.16) to project, previous copy was not v1.0.16
+
+v5.0.7
+
+Corrected issue with missing files in CommonClientCode folder
+Removed CommonCode folder
+
+v5.0.7
+
+Updated embedded xLib6000 to v1.0.16
+
+v5.0.5
+
+Updated embedded xLib6000 to v1.0.14
+Audio, Iq, Panadapter & Waterfall StreamHandlers Changed from ...StreamHandler(_ frame:) to streamHandler(_ frame:)
+SplitViewController - removed ", addTimestamp: Bool = true" from showInObjectsTable(_:)
+SplitViewController - changed Api Delegate method streamHandler(_:) to vitaParser(_:)
+
+v5.0.4
+
+ViewController.swift - in openRadio(...) & closeRadio() added _connectButton.identifier = ...
+
+v5.0.1
+
+Removed CommonLibraryCode
+Added reference to xLib6000
+Removed bridging header
