@@ -874,7 +874,7 @@ public final class ViewController             : NSViewController, RadioPickerDel
                                clientStation: station,
                                programName: AppDelegate.kName,
                                clientId: _clientId,
-                               isGui: true,
+                               isGui: Defaults[.isGui],
                                isWan: isWan,
                                wanHandle: wanHandle)
         
