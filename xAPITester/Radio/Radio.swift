@@ -7,7 +7,7 @@
 //
 
 import Foundation
-
+import xLib6000
 
 // --------------------------------------------------------------------------------
 // MARK: - Radio Class implementation
