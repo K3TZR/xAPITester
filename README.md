@@ -1,9 +1,9 @@
-# xAPITester
-
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://en.wikipedia.org/wiki/MIT_License)
 
+# xAPITester
+
 ## API Explorer for the FlexRadio (TM) 6000 series software defined radios.
-##      (currently supports Radios with Version 2.4.9 or lower, see Evolution below)
+###      (currently supports Radios with Version 2.4.9 or lower, see Evolution below)
 
 ### Built on:
 
