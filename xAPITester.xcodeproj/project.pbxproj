@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		917AAA8223D5EDAE0082FAEB /* xLib6000 in Frameworks */ = {isa = PBXBuildFile; productRef = 917AAA8123D5EDAE0082FAEB /* xLib6000 */; };
+		917AAA8523D5EDC80082FAEB /* ObjcExceptionBridging in Frameworks */ = {isa = PBXBuildFile; productRef = 917AAA8423D5EDC80082FAEB /* ObjcExceptionBridging */; };
+		917AAA8723D5EDC80082FAEB /* XCGLogger in Frameworks */ = {isa = PBXBuildFile; productRef = 917AAA8623D5EDC80082FAEB /* XCGLogger */; };
+		917AAA8A23D5EDFA0082FAEB /* SwiftyUserDefaults in Frameworks */ = {isa = PBXBuildFile; productRef = 917AAA8923D5EDFA0082FAEB /* SwiftyUserDefaults */; };
 		919614C023D137910069AE94 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9196149A23D137900069AE94 /* AppDelegate.swift */; };
 		919614C123D137910069AE94 /* Main.strings in Resources */ = {isa = PBXBuildFile; fileRef = 9196149C23D137900069AE94 /* Main.strings */; };
 		919614C223D137910069AE94 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9196149F23D137900069AE94 /* Main.storyboard */; };
@@ -32,10 +36,6 @@
 		919614D823D137910069AE94 /* xAPITester.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 919614BF23D137910069AE94 /* xAPITester.pdf */; };
 		919614DB23D137FE0069AE94 /* ChangeLog.txt in Resources */ = {isa = PBXBuildFile; fileRef = 919614D923D137FE0069AE94 /* ChangeLog.txt */; };
 		919614DC23D137FE0069AE94 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 919614DA23D137FE0069AE94 /* README.md */; };
-		919614EA23D1382A0069AE94 /* xLib6000 in Frameworks */ = {isa = PBXBuildFile; productRef = 919614E923D1382A0069AE94 /* xLib6000 */; };
-		919614EE23D140C60069AE94 /* SwiftyUserDefaults in Frameworks */ = {isa = PBXBuildFile; productRef = 919614ED23D140C60069AE94 /* SwiftyUserDefaults */; };
-		919614F123D144BC0069AE94 /* ObjcExceptionBridging in Frameworks */ = {isa = PBXBuildFile; productRef = 919614F023D144BC0069AE94 /* ObjcExceptionBridging */; };
-		919614F323D144BC0069AE94 /* XCGLogger in Frameworks */ = {isa = PBXBuildFile; productRef = 919614F223D144BC0069AE94 /* XCGLogger */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -75,10 +75,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				919614EA23D1382A0069AE94 /* xLib6000 in Frameworks */,
-				919614F123D144BC0069AE94 /* ObjcExceptionBridging in Frameworks */,
-				919614EE23D140C60069AE94 /* SwiftyUserDefaults in Frameworks */,
-				919614F323D144BC0069AE94 /* XCGLogger in Frameworks */,
+				917AAA8523D5EDC80082FAEB /* ObjcExceptionBridging in Frameworks */,
+				917AAA8223D5EDAE0082FAEB /* xLib6000 in Frameworks */,
+				917AAA8723D5EDC80082FAEB /* XCGLogger in Frameworks */,
+				917AAA8A23D5EDFA0082FAEB /* SwiftyUserDefaults in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -242,10 +242,10 @@
 			);
 			name = xAPITester;
 			packageProductDependencies = (
-				919614E923D1382A0069AE94 /* xLib6000 */,
-				919614ED23D140C60069AE94 /* SwiftyUserDefaults */,
-				919614F023D144BC0069AE94 /* ObjcExceptionBridging */,
-				919614F223D144BC0069AE94 /* XCGLogger */,
+				917AAA8123D5EDAE0082FAEB /* xLib6000 */,
+				917AAA8423D5EDC80082FAEB /* ObjcExceptionBridging */,
+				917AAA8623D5EDC80082FAEB /* XCGLogger */,
+				917AAA8923D5EDFA0082FAEB /* SwiftyUserDefaults */,
 			);
 			productName = xAPITester;
 			productReference = 9196148623D1372D0069AE94 /* xAPITester.app */;
@@ -277,9 +277,9 @@
 			);
 			mainGroup = 9196147D23D1372D0069AE94;
 			packageReferences = (
-				919614E823D1382A0069AE94 /* XCRemoteSwiftPackageReference "xLib6000" */,
-				919614EC23D140C60069AE94 /* XCRemoteSwiftPackageReference "SwiftyUserDefaults" */,
-				919614EF23D144BC0069AE94 /* XCRemoteSwiftPackageReference "XCGLogger" */,
+				917AAA8023D5EDAE0082FAEB /* XCRemoteSwiftPackageReference "xLib6000" */,
+				917AAA8323D5EDC80082FAEB /* XCRemoteSwiftPackageReference "XCGLogger" */,
+				917AAA8823D5EDFA0082FAEB /* XCRemoteSwiftPackageReference "SwiftyUserDefaults" */,
 			);
 			productRefGroup = 9196148723D1372D0069AE94 /* Products */;
 			projectDirPath = "";
@@ -547,52 +547,52 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		919614E823D1382A0069AE94 /* XCRemoteSwiftPackageReference "xLib6000" */ = {
+		917AAA8023D5EDAE0082FAEB /* XCRemoteSwiftPackageReference "xLib6000" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "git@github.com:K3TZR/xLib6000.git";
+			repositoryURL = "https://github.com/K3TZR/xLib6000.git";
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 1.0.0;
 			};
 		};
-		919614EC23D140C60069AE94 /* XCRemoteSwiftPackageReference "SwiftyUserDefaults" */ = {
+		917AAA8323D5EDC80082FAEB /* XCRemoteSwiftPackageReference "XCGLogger" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "git@github.com:sunshinejr/SwiftyUserDefaults.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 4.0.0;
-			};
-		};
-		919614EF23D144BC0069AE94 /* XCRemoteSwiftPackageReference "XCGLogger" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "git@github.com:DaveWoodCom/XCGLogger.git";
+			repositoryURL = "https://github.com/DaveWoodCom/XCGLogger.git";
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 7.0.0;
 			};
 		};
+		917AAA8823D5EDFA0082FAEB /* XCRemoteSwiftPackageReference "SwiftyUserDefaults" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sunshinejr/SwiftyUserDefaults.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		919614E923D1382A0069AE94 /* xLib6000 */ = {
+		917AAA8123D5EDAE0082FAEB /* xLib6000 */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 919614E823D1382A0069AE94 /* XCRemoteSwiftPackageReference "xLib6000" */;
+			package = 917AAA8023D5EDAE0082FAEB /* XCRemoteSwiftPackageReference "xLib6000" */;
 			productName = xLib6000;
 		};
-		919614ED23D140C60069AE94 /* SwiftyUserDefaults */ = {
+		917AAA8423D5EDC80082FAEB /* ObjcExceptionBridging */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 919614EC23D140C60069AE94 /* XCRemoteSwiftPackageReference "SwiftyUserDefaults" */;
-			productName = SwiftyUserDefaults;
-		};
-		919614F023D144BC0069AE94 /* ObjcExceptionBridging */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 919614EF23D144BC0069AE94 /* XCRemoteSwiftPackageReference "XCGLogger" */;
+			package = 917AAA8323D5EDC80082FAEB /* XCRemoteSwiftPackageReference "XCGLogger" */;
 			productName = ObjcExceptionBridging;
 		};
-		919614F223D144BC0069AE94 /* XCGLogger */ = {
+		917AAA8623D5EDC80082FAEB /* XCGLogger */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 919614EF23D144BC0069AE94 /* XCRemoteSwiftPackageReference "XCGLogger" */;
+			package = 917AAA8323D5EDC80082FAEB /* XCRemoteSwiftPackageReference "XCGLogger" */;
 			productName = XCGLogger;
+		};
+		917AAA8923D5EDFA0082FAEB /* SwiftyUserDefaults */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 917AAA8823D5EDFA0082FAEB /* XCRemoteSwiftPackageReference "SwiftyUserDefaults" */;
+			productName = SwiftyUserDefaults;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
