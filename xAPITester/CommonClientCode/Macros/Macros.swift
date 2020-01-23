@@ -19,7 +19,7 @@ final public class Macros {
   // MARK: - Private properties
   
   private var _api                            = Api.sharedInstance          // Api to the Radio
-  private let _log                            = NSApp.delegate as! AppDelegate
+  private let _log                            = (NSApp.delegate as! AppDelegate).msg
 
   // ----------------------------------------------------------------------------
   // MARK: - Public Instance methods
@@ -63,7 +63,7 @@ final public class Macros {
       } catch {
         
         // something bad happened!
-        _log.msg("Error reading file \(fileString)", level: .error, function: #function, file: #file, line: #line)
+        _log("Error reading file \(fileString)", .error, #function, #file, #line)
       }
     }
     
@@ -143,9 +143,9 @@ final public class Macros {
     
     // should only be two
     guard components.count == 2 else {
-//      _log.msg("Malformed macro condition - \(condition)", level: .error, function: #function, file: #file, line: #line)
+//      _log("Malformed macro condition - \(condition)", .error, #function, #file, #line)
 
-      _log.msg("Malformed macro condition - \(condition)", level: .error, function: #function, file: #file, line: #line)
+      _log("Malformed macro condition - \(condition)", .error, #function, #file, #line)
 
       return false
     }
@@ -224,9 +224,9 @@ final public class Macros {
         result = ((object as! xLib6000.Slice).xitEnabled == true)
         
       default:
-//        _log.msg("Unknown macro action - \(components[1])", level: .error, function: #function, file: #file, line: #line)
+//        _log("Unknown macro action - \(components[1])", .error, #function, #file, #line)
 
-        _log.msg("Unknown macro action - \(String(components[1]))", level: .error, function: #function, file: #file, line: #line)
+        _log("Unknown macro action - \(String(components[1]))", .error, #function, #file, #line)
       }
     }
     return result
@@ -299,9 +299,9 @@ final public class Macros {
         return _api.radio!.slices[String(number).objectId!]
         
       default:
-//        _log.msg("Macro error: slice - \(number)", level: .error, function: #function, file: #file, line: #line)
+//        _log("Macro error: slice - \(number)", .error, #function, #file, #line)
 
-        _log.msg("Macro error: slice - \(String(number))", level: .error, function: #function, file: #file, line: #line)
+        _log("Macro error: slice - \(String(number))", .error, #function, #file, #line)
 
         return nil
       }
@@ -311,17 +311,17 @@ final public class Macros {
         return _api.radio!.panadapters[kPanadapterBase + UInt32(number)!]
         
       default:
-//        _log.msg("Macro error: panadapter - \(number)", level: .error, function: #function, file: #file, line: #line)
+//        _log("Macro error: panadapter - \(number)", .error, #function, #file, #line)
 
-        _log.msg("Macro error: panadapter - \(String(number))", level: .error, function: #function, file: #file, line: #line)
+        _log("Macro error: panadapter - \(String(number))", .error, #function, #file, #line)
         
         return nil
       }
       
     default:
-//      _log.msg("Macro error: object - \(object)", level: .error, function: #function, file: #file, line: #line)
+//      _log("Macro error: object - \(object)", .error, #function, #file, #line)
 
-      _log.msg("Macro error: object - \(String(object))", level: .error, function: #function, file: #file, line: #line)
+      _log("Macro error: object - \(String(object))", .error, #function, #file, #line)
       
       return nil
     }
@@ -366,9 +366,9 @@ final public class Macros {
         return (slice.frequency + value).hzToMhz
         
       default:
-//        _log.msg("Macro error: slice param - \(p)", level: .error, function: #function, file: #file, line: #line)
+//        _log("Macro error: slice param - \(p)", .error, #function, #file, #line)
 
-        _log.msg("Macro error: slice param - \(String(p))", level: .error, function: #function, file: #file, line: #line)
+        _log("Macro error: slice param - \(String(p))", .error, #function, #file, #line)
         return nil
       }
     } else if let panadapter = object as? Panadapter {      // Panadapter params
@@ -381,9 +381,9 @@ final public class Macros {
         return String(panadapter.bandwidth)
         
       default:
-//        _log.msg("Macro error: panadapter param - \(p)", level: .error, function: #function, file: #file, line: #line)
+//        _log("Macro error: panadapter param - \(p)", .error, #function, #file, #line)
 
-        _log.msg("Macro error: panadapter param - \(String(p))", level: .error, function: #function, file: #file, line: #line)
+        _log("Macro error: panadapter param - \(String(p))", .error, #function, #file, #line)
         return nil
       }
     }

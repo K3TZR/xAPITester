@@ -42,8 +42,8 @@ public final class ViewController             : NSViewController, RadioPickerDel
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _api                            = Api.sharedInstance          // Api to the Radio
-  private let _log                            = NSApp.delegate as! AppDelegate
+  private var _api                            = Api.sharedInstance
+  private let _log                            = (NSApp.delegate as! AppDelegate).msg
   private var _radios                         : [DiscoveryStruct] { Discovery.sharedInstance.discoveredRadios }
 
   @IBOutlet weak internal var _command        : NSTextField!
@@ -71,7 +71,8 @@ public final class ViewController             : NSViewController, RadioPickerDel
   private var _macros                         : Macros!
   private var _versions                       : (api: String, app: String)?
   private var _clientId                       : UUID?
-
+  private var _appVersion                     = Version()
+  
   // constants
   private let _dateFormatter                  = DateFormatter()
   private let kAutosaveName                   = NSWindow.FrameAutosaveName("xAPITesterWindow")
@@ -104,7 +105,7 @@ public final class ViewController             : NSViewController, RadioPickerDel
     super.viewDidLoad()
     
     // give the Api access to our logger
-    Log.sharedInstance.delegate = _log
+    Log.sharedInstance.delegate = (NSApp.delegate as! AppDelegate)
     
     addNotifications()
     
@@ -197,7 +198,7 @@ public final class ViewController             : NSViewController, RadioPickerDel
         // YES, open the default radio
         _api.radio = openRadio(defaultRadio)
         if _api.radio == nil {
-          _log.msg("Error opening default radio, \(defaultRadio.nickname)", level: .warning, function: #function, file: #file, line: #line)
+          _log("Error opening default radio, \(defaultRadio.nickname)", .warning, #function, #file, #line)
 
           // open the Radio Picker
           openRadioPicker(self)
@@ -401,7 +402,7 @@ public final class ViewController             : NSViewController, RadioPickerDel
         
         // write it to the File
         if let error = savePanel.url!.writeArray( self._splitViewVC!._filteredMessages ) {
-         self._log.msg("\(error)", level: .error, function: #function, file: #file, line: #line)
+         self._log("\(error)", .error, #function, #file, #line)
         }
       }
     }
@@ -425,7 +426,7 @@ public final class ViewController             : NSViewController, RadioPickerDel
         
         // write it to the File
         if let error = savePanel.url!.writeArray( self._commandsArray ) {
-          self._log.msg("\(error)", level: .error, function: #function, file: #file, line: #line)
+          self._log("\(error)", .error, #function, #file, #line)
         }
       }
     }
@@ -462,7 +463,7 @@ public final class ViewController             : NSViewController, RadioPickerDel
         } else {
           
           // NO, log it
-          _log.msg("Condition false: \(evaluatedCommand.condition)", level: .error, function: #function, file: #file, line: #line)
+          _log("Condition false: \(evaluatedCommand.condition)", .error, #function, #file, #line)
         }
       
       } else {
@@ -571,7 +572,7 @@ public final class ViewController             : NSViewController, RadioPickerDel
         // YES, Save it in case something changed
         Defaults[.defaultRadioSerialNumber] = defaultSerialNumber
 
-        _log.msg("Default radio found, \(radio.nickname) @ \(radio.publicIp), serial \(radio.serialNumber)", level: .info, function: #function, file: #file, line: #line)
+        _log("Default radio found, \(radio.nickname) @ \(radio.publicIp), serial \(radio.serialNumber)", .info, #function, #file, #line)
 
         defaultRadio = radio
       }
@@ -645,7 +646,7 @@ public final class ViewController             : NSViewController, RadioPickerDel
 //        Defaults[.defaultRadio] = foundRadioParameters.dict
 //        
 //        // log it
-//        _log.msg("Default radio found: \(foundRadioParameters.nickname) @ \(foundRadioParameters.publicIp)", level: .info, function: #function, file: #file, line: #line)
+//        _log("Default radio found: \(foundRadioParameters.nickname) @ \(foundRadioParameters.publicIp)", .info, #function, #file, #line)
 //      }
 //      if found {
 //        
@@ -677,11 +678,11 @@ public final class ViewController             : NSViewController, RadioPickerDel
     
     // log it (before connected)
     if _api.radio == nil {
-      self._log.msg( "\(AppDelegate.kName) v\(AppDelegate.kVersion.string), \(Api.kName) v\(Api.kVersion.string)", level: .info, function: #function, file: #file, line: #line)
+      self._log( "\(AppDelegate.kName) v\(_appVersion.string), \(Api.kName) v\(_api.libVersion.string)", .info, #function, #file, #line)
     }
     // set the title bar
     DispatchQueue.main.async {
-      self.view.window?.title = "\(AppDelegate.kName) v\(AppDelegate.kVersion.string)     \(Api.kName) v\(Api.kVersion.string)     \(title)"
+      self.view.window?.title = "\(AppDelegate.kName) v\(self._appVersion.string)     \(Api.kName) v\(self._api.libVersion.string)     \(title)"
     }
   }
   

@@ -16,7 +16,6 @@
 		9187257E23D63C8A009B63A3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9187255B23D63C8A009B63A3 /* Assets.xcassets */; };
 		9187258523D63C8A009B63A3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9187256523D63C8A009B63A3 /* AppDelegate.swift */; };
 		9187258623D63C8A009B63A3 /* AppExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9187256723D63C8A009B63A3 /* AppExtensions.swift */; };
-		9187258723D63C8A009B63A3 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9187256823D63C8A009B63A3 /* Info.plist */; };
 		9187258823D63C8A009B63A3 /* Keychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9187256B23D63C8A009B63A3 /* Keychain.swift */; };
 		9187258923D63C8A009B63A3 /* JWTDecode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9187256D23D63C8A009B63A3 /* JWTDecode.swift */; };
 		9187258A23D63C8A009B63A3 /* JWT.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9187256E23D63C8A009B63A3 /* JWT.swift */; };
@@ -86,19 +85,16 @@
 		9187255523D63C8A009B63A3 /* xAPITester */ = {
 			isa = PBXGroup;
 			children = (
-				9187259823D63D8F009B63A3 /* Main.storyboard */,
-				9187256523D63C8A009B63A3 /* AppDelegate.swift */,
-				9187256723D63C8A009B63A3 /* AppExtensions.swift */,
-				9187259B23D63ED9009B63A3 /* ViewController.swift */,
-				9187259D23D63ED9009B63A3 /* SplitViewController.swift */,
-				9187259A23D63ED9009B63A3 /* MeterViewController.swift */,
-				9187259C23D63ED9009B63A3 /* HelpViewController.swift */,
-				9187256923D63C8A009B63A3 /* CommonClientCode */,
-				9187255623D63C8A009B63A3 /* Documentation */,
-				9187255A23D63C8A009B63A3 /* Defaults.plist */,
+				9187256423D63C8A009B63A3 /* xAPITester.entitlements */,
 				9187256823D63C8A009B63A3 /* Info.plist */,
 				9187255B23D63C8A009B63A3 /* Assets.xcassets */,
-				9187256423D63C8A009B63A3 /* xAPITester.entitlements */,
+				9187259823D63D8F009B63A3 /* Main.storyboard */,
+				9187256523D63C8A009B63A3 /* AppDelegate.swift */,
+				918725A423D8B2EF009B63A3 /* Extensions */,
+				918725A523D8B2FF009B63A3 /* View Controllers */,
+				9187256923D63C8A009B63A3 /* CommonClientCode */,
+				9187255623D63C8A009B63A3 /* Documentation */,
+				918725A623D8B342009B63A3 /* Supporting */,
 			);
 			path = xAPITester;
 			sourceTree = "<group>";
@@ -168,6 +164,33 @@
 				9187257A23D63C8A009B63A3 /* Macros.swift */,
 			);
 			path = Macros;
+			sourceTree = "<group>";
+		};
+		918725A423D8B2EF009B63A3 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				9187256723D63C8A009B63A3 /* AppExtensions.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		918725A523D8B2FF009B63A3 /* View Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				9187259B23D63ED9009B63A3 /* ViewController.swift */,
+				9187259D23D63ED9009B63A3 /* SplitViewController.swift */,
+				9187259A23D63ED9009B63A3 /* MeterViewController.swift */,
+				9187259C23D63ED9009B63A3 /* HelpViewController.swift */,
+			);
+			path = "View Controllers";
+			sourceTree = "<group>";
+		};
+		918725A623D8B342009B63A3 /* Supporting */ = {
+			isa = PBXGroup;
+			children = (
+				9187255A23D63C8A009B63A3 /* Defaults.plist */,
+			);
+			path = Supporting;
 			sourceTree = "<group>";
 		};
 		9196147D23D1372D0069AE94 = {
@@ -272,7 +295,6 @@
 				9187257E23D63C8A009B63A3 /* Assets.xcassets in Resources */,
 				9187257D23D63C8A009B63A3 /* Defaults.plist in Resources */,
 				9187259523D63CD1009B63A3 /* README.md in Resources */,
-				9187258723D63C8A009B63A3 /* Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -428,6 +450,7 @@
 				CODE_SIGN_ENTITLEMENTS = xAPITester/xAPITester.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = EE5B8TYXGA;
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -440,9 +463,9 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = net.k3tzr.xAPITester;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "xAPITester/xAPITester-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 			};
@@ -456,6 +479,7 @@
 				CODE_SIGN_ENTITLEMENTS = xAPITester/xAPITester.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = EE5B8TYXGA;
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -468,9 +492,9 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = net.k3tzr.xAPITester;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "xAPITester/xAPITester-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
@@ -503,8 +527,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/K3TZR/xLib6000.git";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
+				branch = master;
+				kind = branch;
 			};
 		};
 		917AAA8323D5EDC80082FAEB /* XCRemoteSwiftPackageReference "XCGLogger" */ = {
