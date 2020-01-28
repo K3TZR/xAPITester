@@ -337,75 +337,75 @@ class SplitViewController: NSSplitViewController, ApiDelegate, NSTableViewDelega
         
         // Panadapters
         for (_, panadapter) in self._api.radio!.panadapters {
-          self.showInObjectsTable("Panadapter     \(panadapter.id.hex)  center = \(panadapter.center.hzToMhz)  bandwidth = \(panadapter.bandwidth.hzToMhz)")
+          self.showInObjectsTable("Panadapter     id = \(panadapter.id.hex)  center = \(panadapter.center.hzToMhz)  bandwidth = \(panadapter.bandwidth.hzToMhz)")
           
           // Waterfall for this Panadapter
           for (_, waterfall) in self._api.radio!.waterfalls where panadapter.id == waterfall.panadapterId {
-            self.showInObjectsTable("      Waterfall   \(waterfall.id.hex)  autoBlackEnabled = \(waterfall.autoBlackEnabled),  colorGain = \(waterfall.colorGain),  blackLevel = \(waterfall.blackLevel),  duration = \(waterfall.lineDuration)")
+            self.showInObjectsTable("      Waterfall   id = \(waterfall.id.hex)  autoBlackEnabled = \(waterfall.autoBlackEnabled),  colorGain = \(waterfall.colorGain),  blackLevel = \(waterfall.blackLevel),  duration = \(waterfall.lineDuration)")
           }
           
           // IQ Streams for this Panadapter
           for (_, iqStream) in self._api.radio!.iqStreams where panadapter.id == iqStream.pan {
-            self.showInObjectsTable("      DaxIq          \(iqStream.id.hex) stream")
+            self.showInObjectsTable("      DaxIq          id = \(iqStream.id.hex)")
           }
           
           // Slices for this Panadapter
           for (_, slice) in self._api.radio!.slices where panadapter.id == slice.panadapterId {
-            self.showInObjectsTable("      Slice          \(slice.id)  pan = \(slice.panadapterId.hex)  frequency = \(slice.frequency.hzToMhz)  filterLow = \(slice.filterLow)  filterHigh = \(slice.filterHigh)  active = \(slice.active)  locked = \(slice.locked)")
+            self.showInObjectsTable("      Slice          id = \(slice.id)  pan = \(slice.panadapterId.hex)  frequency = \(slice.frequency.hzToMhz)  filterLow = \(slice.filterLow)  filterHigh = \(slice.filterHigh)  active = \(slice.active)  locked = \(slice.locked)")
             
             // Audio Stream for this Slice
             for (_, audioStream) in self._api.radio!.audioStreams {
               if audioStream.slice?.id == slice.id {
-                self.showInObjectsTable("           DaxAudio       \(audioStream.id.hex) stream")
+                self.showInObjectsTable("           DaxAudio       id = \(audioStream.id.hex) stream")
               }
             }
             
             // sort the Meters for this Slice
             for (_, meter) in self._api.radio!.meters.sorted(by: { $0.value.id < $1.value.id }) {
               if meter.source == "slc" && meter.group == String(slice.id) {
-              self.showInObjectsTable("           Meter \(meter.id)  name = \(meter.name)  desc = \(meter.desc)  units = \(meter.units)  low = \(meter.low)  high = \(meter.high)  fps = \(meter.fps)")
+              self.showInObjectsTable("           Meter id = \(meter.id)  name = \(meter.name)  desc = \(meter.desc)  units = \(meter.units)  low = \(meter.low)  high = \(meter.high)  fps = \(meter.fps)")
               }
             }            
           }
         }
         // Tx Audio Streams
         for (_, txAudioStream) in self._api.radio!.txAudioStreams {
-          self.showInObjectsTable("Tx Audio       \(txAudioStream.id.hex) stream")
+          self.showInObjectsTable("Tx Audio       id = \(txAudioStream.id.hex)")
         }
         
         // Opus Streams
         for (_, opusStream) in self._api.radio!.opusStreams {
-          self.showInObjectsTable("Opus           \(opusStream.id.hex) stream, rx = \(opusStream.rxEnabled), rx stopped = \(opusStream.rxStopped), tx = \(opusStream.txEnabled)")
+          self.showInObjectsTable("Opus           id = \(opusStream.id.hex)  rx = \(opusStream.rxEnabled)  rx stopped = \(opusStream.rxStopped)  tx = \(opusStream.txEnabled)")
         }
         
         // IQ Streams without a Panadapter
         for (_, iqStream) in self._api.radio!.iqStreams where iqStream.pan == 0 {
-          self.showInObjectsTable("DaxIq          \(iqStream.id.hex) stream,  panadapter = -not assigned-")
+          self.showInObjectsTable("DaxIq          id = \(iqStream.id.hex)  panadapter = -not assigned-")
         }
         
         // Audio Stream without a Slice
         for (_, audioStream) in self._api.radio!.audioStreams where audioStream.slice == nil {
-          self.showInObjectsTable("DaxAudio       \(audioStream.id.hex) stream,  slice = -not assigned-")
+          self.showInObjectsTable("DaxAudio       id = \(audioStream.id.hex)  slice = -not assigned-")
         }
         // Tnfs
         for (_, tnf) in self._api.radio!.tnfs {
-          self.showInObjectsTable("Tnf            \(tnf.id)  frequency = \(tnf.frequency)  width = \(tnf.width)  depth = \(tnf.depth)  permanent = \(tnf.permanent)")
+          self.showInObjectsTable("Tnf            id = \(tnf.id)  frequency = \(tnf.frequency)  width = \(tnf.width)  depth = \(tnf.depth)  permanent = \(tnf.permanent)")
         }
         // Amplifiers
         for (_, amplifier) in self._api.radio!.amplifiers {
-          self.showInObjectsTable("Amplifier      \(amplifier.id)")
+          self.showInObjectsTable("Amplifier      id = \(amplifier.id)")
         }
         // Memories
         for (_, memory) in self._api.radio!.memories {
-          self.showInObjectsTable("Memory         \(memory.id)")
+          self.showInObjectsTable("Memory         id = \(memory.id)")
         }
         // USB Cables
         for (_, usbCable) in self._api.radio!.usbCables {
-          self.showInObjectsTable("UsbCable       \(usbCable.id)")
+          self.showInObjectsTable("UsbCable       id = \(usbCable.id)")
         }
         // Xvtrs
         for (_, xvtr) in self._api.radio!.xvtrs {
-          self.showInObjectsTable("Xvtr           \(xvtr.id)")
+          self.showInObjectsTable("Xvtr           id = \(xvtr.id)  rf frequency = \(xvtr.rfFrequency.hzToMhz)  if frequency = \(xvtr.ifFrequency.hzToMhz)  valid = \(xvtr.isValid.asTrueFalse)")
         }
         // Meters (not for a Slice)
         let sortedMeters = self._api.radio!.meters.sorted(by: {
