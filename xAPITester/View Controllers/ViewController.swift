@@ -71,7 +71,6 @@ public final class ViewController             : NSViewController, RadioPickerDel
   private var _macros                         : Macros!
   private var _versions                       : (api: String, app: String)?
   private var _clientId                       : UUID?
-  private var _appVersion                     = Version()
   
   // constants
   private let _dateFormatter                  = DateFormatter()
@@ -672,17 +671,20 @@ public final class ViewController             : NSViewController, RadioPickerDel
   /// Set the Window's title
   ///
   private func title() {
-    
-    // format and set the window title
-    let title = (_api.radio == nil ? "" : "Connected to \(_api.radio!.nickname) @ \(_api.radio!.discoveryPacket.publicIp)")
-    
-    // log it (before connected)
-    if _api.radio == nil {
-      self._log( "\(AppDelegate.kName) v\(_appVersion.string), \(Api.kName) v\(_api.libVersion.string)", .info, #function, #file, #line)
+    var title = ""
+    // are we connected?
+    if let radio = _api.radio {
+      // Yes, format and set the window title
+      title = "\(radio.discoveryPacket.nickname) @ \(radio.discoveryPacket.publicIp) (v\(radio.version.string) \(_api.isWan ? "SmartLink" : "Local"))       xAPITester (v\(AppDelegate.kVersion.string))       xLib6000 (v\(Api.kVersion.string))"
+
+    } else {
+      // Log it before connecting
+      self._log( "\(AppDelegate.kName) v\(AppDelegate.kVersion.string), \(Api.kName) v\(Api.kVersion.string)", .info, #function, #file, #line)
+      title = "\(AppDelegate.kName) v\(AppDelegate.kVersion.string)     \(Api.kName) v\(Api.kVersion.string)"
     }
     // set the title bar
     DispatchQueue.main.async {
-      self.view.window?.title = "\(AppDelegate.kName) v\(self._appVersion.string)     \(Api.kName) v\(self._api.libVersion.string)     \(title)"
+      self.view.window?.title = title
     }
   }
   
@@ -694,8 +696,6 @@ public final class ViewController             : NSViewController, RadioPickerDel
   private func addNotifications() {
     
     NC.makeObserver(self, with: #selector(radioDowngrade(_:)), of: .radioDowngrade)
-    
-    NC.makeObserver(self, with: #selector(radioUpgrade(_:)), of: .radioUpgrade)
   }
   /// Process .radioDowngrade Notification
   ///
@@ -712,8 +712,8 @@ public final class ViewController             : NSViewController, RadioPickerDel
       alert.alertStyle = .warning
       alert.messageText = "The Radio's version may not be supported by this version of \(AppDelegate.kName)."
       alert.informativeText = """
-      Radio:\t\tv\(versions[1].string)
-      xSDR6000:\tv\(versions[0].shortString)
+      Radio:\t\tv\(versions[1].longString)
+      xLib6000:\tv\(versions[0].string)
       
       You can use SmartSDR to DOWNGRADE the Radio
       \t\t\tOR
@@ -732,32 +732,32 @@ public final class ViewController             : NSViewController, RadioPickerDel
   ///
   /// - Parameter note:         a Notification instance
   ///
-  @objc private func radioUpgrade(_ note: Notification) {
-    
-    let versions = note.object as! [Version]
-    
-    // the API version is later than the Radio version
-    DispatchQueue.main.async {
-      let alert = NSAlert()
-      alert.alertStyle = .warning
-      alert.messageText = "The Radio's version may not be supported by this version of \(AppDelegate.kName)."
-      alert.informativeText = """
-      Radio:\t\tv\(versions[1].string)
-      xSDR6000:\tv\(versions[0].shortString)
-      
-      You can use SmartSDR to UPGRADE the Radio
-      \t\t\tOR
-      Install an older version of \(AppDelegate.kName)
-      """
-      alert.addButton(withTitle: "Close")
-      alert.addButton(withTitle: "Continue")
-      alert.beginSheetModal(for: self.view.window!, completionHandler: { (response) in
-        if response == NSApplication.ModalResponse.alertFirstButtonReturn {
-          NSApp.terminate(self)
-        }
-      })
-    }
-  }
+//  @objc private func radioUpgrade(_ note: Notification) {
+//
+//    let versions = note.object as! [Version]
+//
+//    // the API version is later than the Radio version
+//    DispatchQueue.main.async {
+//      let alert = NSAlert()
+//      alert.alertStyle = .warning
+//      alert.messageText = "The Radio's version may not be supported by this version of \(AppDelegate.kName)."
+//      alert.informativeText = """
+//      Radio:\t\tv\(versions[1].longString)
+//      xLib6000:\tv\(versions[0].string)
+//
+//      You can use SmartSDR to UPGRADE the Radio
+//      \t\t\tOR
+//      Install an older version of \(AppDelegate.kName)
+//      """
+//      alert.addButton(withTitle: "Close")
+//      alert.addButton(withTitle: "Continue")
+//      alert.beginSheetModal(for: self.view.window!, completionHandler: { (response) in
+//        if response == NSApplication.ModalResponse.alertFirstButtonReturn {
+//          NSApp.terminate(self)
+//        }
+//      })
+//    }
+//  }
 
   // ----------------------------------------------------------------------------
   // MARK: - RadioPickerDelegate methods
