@@ -90,7 +90,7 @@ class SplitViewController: NSSplitViewController, ApiDelegate, NSTableViewDelega
   // MARK: - Private properties
   
   private var _api                            = Api.sharedInstance          // Api to the Radio
-  private let _log                            = (NSApp.delegate as! AppDelegate).msg
+  private let _log                            = NSApp.delegate as! AppDelegate
   internal weak var _parent                   : ViewController?
   internal let _objectQ                       = DispatchQueue(label: AppDelegate.kName + ".objectQ", attributes: [.concurrent])
   
@@ -271,7 +271,7 @@ class SplitViewController: NSSplitViewController, ApiDelegate, NSTableViewDelega
       
 //      _api.log.msg("Incomplete reply, c\(commandSuffix)", .error, #function, #file, #line)
 
-      _log("Incomplete reply, c\(commandSuffix)", .error, #function, #file, #line)
+      _log.logMessage("Incomplete reply, c\(commandSuffix)", .error, #function, #file, #line)
       return
     }
     
@@ -491,7 +491,7 @@ class SplitViewController: NSSplitViewController, ApiDelegate, NSTableViewDelega
     default:    // Unknown Type
 //      _api.log.msg("Unexpected Message Type from radio, \(text[text.startIndex])", .error, #function, #file, #line)
 
-      _log("Unexpected Message Type from radio, \(text[text.startIndex] as! CVarArg)", .error, #function, #file, #line)
+      _log.logMessage("Unexpected Message Type from radio, \(text[text.startIndex] as! CVarArg)", .error, #function, #file, #line)
     }
   }
   /// Add a Reply Handler for a specific Sequence/Command

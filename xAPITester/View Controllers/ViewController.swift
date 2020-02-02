@@ -43,7 +43,7 @@ public final class ViewController             : NSViewController, RadioPickerDel
   // MARK: - Private properties
   
   private var _api                            = Api.sharedInstance
-  private let _log                            = (NSApp.delegate as! AppDelegate).msg
+  private let _log                            = (NSApp.delegate as! AppDelegate)
   private var _radios                         : [DiscoveryStruct] { Discovery.sharedInstance.discoveredRadios }
 
   @IBOutlet weak internal var _command        : NSTextField!
@@ -197,7 +197,7 @@ public final class ViewController             : NSViewController, RadioPickerDel
         // YES, open the default radio
         _api.radio = openRadio(defaultRadio)
         if _api.radio == nil {
-          _log("Error opening default radio, \(defaultRadio.nickname)", .warning, #function, #file, #line)
+          _log.logMessage("Error opening default radio, \(defaultRadio.nickname)", .warning, #function, #file, #line)
 
           // open the Radio Picker
           openRadioPicker(self)
@@ -401,7 +401,7 @@ public final class ViewController             : NSViewController, RadioPickerDel
         
         // write it to the File
         if let error = savePanel.url!.writeArray( self._splitViewVC!._filteredMessages ) {
-         self._log("\(error)", .error, #function, #file, #line)
+         self._log.logMessage("\(error)", .error, #function, #file, #line)
         }
       }
     }
@@ -425,7 +425,7 @@ public final class ViewController             : NSViewController, RadioPickerDel
         
         // write it to the File
         if let error = savePanel.url!.writeArray( self._commandsArray ) {
-          self._log("\(error)", .error, #function, #file, #line)
+          self._log.logMessage("\(error)", .error, #function, #file, #line)
         }
       }
     }
@@ -462,7 +462,7 @@ public final class ViewController             : NSViewController, RadioPickerDel
         } else {
           
           // NO, log it
-          _log("Condition false: \(evaluatedCommand.condition)", .error, #function, #file, #line)
+          _log.logMessage("Condition false: \(evaluatedCommand.condition)", .error, #function, #file, #line)
         }
       
       } else {
@@ -571,7 +571,7 @@ public final class ViewController             : NSViewController, RadioPickerDel
         // YES, Save it in case something changed
         Defaults[.defaultRadioSerialNumber] = defaultSerialNumber
 
-        _log("Default radio found, \(radio.nickname) @ \(radio.publicIp), serial \(radio.serialNumber)", .info, #function, #file, #line)
+        _log.logMessage("Default radio found, \(radio.nickname) @ \(radio.publicIp), serial \(radio.serialNumber)", .info, #function, #file, #line)
 
         defaultRadio = radio
       }
@@ -679,7 +679,7 @@ public final class ViewController             : NSViewController, RadioPickerDel
 
     } else {
       // Log it before connecting
-      self._log( "\(AppDelegate.kName) v\(AppDelegate.kVersion.string), \(Api.kName) v\(Api.kVersion.string)", .info, #function, #file, #line)
+      self._log.logMessage( "\(AppDelegate.kName) v\(AppDelegate.kVersion.string), \(Api.kName) v\(Api.kVersion.string)", .info, #function, #file, #line)
       title = "\(AppDelegate.kName) v\(AppDelegate.kVersion.string)     \(Api.kName) v\(Api.kVersion.string)"
     }
     // set the title bar

@@ -127,28 +127,28 @@ final class AppDelegate                     : NSObject, NSApplicationDelegate, L
   ///   - file:       the name of the file containing the function
   ///   - line:       the line number creating the msg
   ///
-  public func msg(_ msg: String, level: MessageLevel, function: StaticString, file: StaticString, line: Int ) {
+  public func logMessage(_ msg: String, _ level: MessageLevel, _ function: StaticString, _ file: StaticString, _ line: Int, _ source: String = kName) {
     
     // Log Handler to support XCGLogger
     
     switch level {
     case .verbose:
-      log.verbose(msg, functionName: function, fileName: file, lineNumber: line )
+      log.verbose(source.prefix(4) + ": " + msg, functionName: function, fileName: file, lineNumber: line )
       
     case .debug:
-      log.debug(msg, functionName: function, fileName: file, lineNumber: line)
+      log.debug(source.prefix(4) + ": " + msg, functionName: function, fileName: file, lineNumber: line)
       
     case .info:
-      log.info(msg, functionName: function, fileName: file, lineNumber: line)
+      log.info(source.prefix(4) + ": " + msg, functionName: function, fileName: file, lineNumber: line)
       
     case .warning:
-      log.warning(msg, functionName: function, fileName: file, lineNumber: line)
+      log.warning(source.prefix(4) + ": " + msg, functionName: function, fileName: file, lineNumber: line)
       
     case .error:
-      log.error(msg, functionName: function, fileName: file, lineNumber: line)
+      log.error(source.prefix(4) + ": " + msg, functionName: function, fileName: file, lineNumber: line)
       
     case .severe:
-      log.severe(msg, functionName: function, fileName: file, lineNumber: line)
+      log.severe(source.prefix(4) + ": " + msg, functionName: function, fileName: file, lineNumber: line)
     }
   }
 }
