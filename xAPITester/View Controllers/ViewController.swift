@@ -26,7 +26,7 @@ protocol RadioPickerDelegate: class {
   ///   - handle:             remote handle
   /// - Returns:              success / failure
   ///
-  func openRadio(_ radio: DiscoveryStruct?, isWan: Bool, wanHandle: String) -> Radio?
+  func openRadio(_ radio: DiscoveryStruct?, isWan: Bool, wanHandle: String) -> Bool
   
   /// Close the active Radio
   ///
@@ -38,6 +38,7 @@ protocol RadioPickerDelegate: class {
 // ------------------------------------------------------------------------------
 
 public final class ViewController             : NSViewController, RadioPickerDelegate,  NSTextFieldDelegate {
+  
   
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
@@ -195,8 +196,7 @@ public final class ViewController             : NSViewController, RadioPickerDel
       if let defaultRadio = defaultRadioFound() {
         
         // YES, open the default radio
-        _api.radio = openRadio(defaultRadio)
-        if _api.radio == nil {
+        if !openRadio(defaultRadio) {
           _log.logMessage("Error opening default radio, \(defaultRadio.nickname)", .warning, #function, #file, #line)
 
           // open the Radio Picker
@@ -839,14 +839,14 @@ public final class ViewController             : NSViewController, RadioPickerDel
     ///   - wanHandle:            Wan handle (if any)
     /// - Returns:                success / failure
     ///
-    func openRadio(_ discoveredRadio: DiscoveryStruct?, isWan: Bool = false, wanHandle: String = "") -> Radio? {
+    func openRadio(_ discoveredRadio: DiscoveryStruct?, isWan: Bool = false, wanHandle: String = "") -> Bool {
       
       if let _ = _radioPickerTabViewController {
         self._radioPickerTabViewController = nil
       }
 
       // exit if no Radio selected
-      guard let selectedRadio = discoveredRadio else { return nil }
+      guard let selectedRadio = discoveredRadio else { return false }
       
       // clear the previous Commands, Replies & Messages
       if Defaults[.clearAtConnect] { _splitViewVC?.messages.removeAll() ;_splitViewVC?._tableView.reloadData() }
@@ -871,24 +871,25 @@ public final class ViewController             : NSViewController, RadioPickerDel
       
       // attempt to connect to it
       let station = (Host.current().localizedName ?? "Mac").replacingSpaces(with: "_")
-      let radio = _api.connect(selectedRadio,
-                               clientStation: station,
-                               programName: AppDelegate.kName,
-                               clientId: _clientId,
-                               isGui: Defaults[.isGui],
-                               isWan: isWan,
-                               wanHandle: wanHandle)
+      if _api.connect(selectedRadio,
+                      clientStation: station,
+                      programName: AppDelegate.kName,
+                      clientId: _clientId,
+                      isGui: Defaults[.isGui],
+                      isWan: isWan,
+                      wanHandle: wanHandle) {
         
         
-      if radio != nil {
-      _startTimestamp = Date()
+        _startTimestamp = Date()
         
         self._connectButton.title = self.kDisconnect.rawValue
         self._connectButton.identifier = self.kDisconnect
         self._sendButton.isEnabled = true
+        title()
+        
+        return true
       }
-      title()
-      return radio
+      return false
   }
 
   
