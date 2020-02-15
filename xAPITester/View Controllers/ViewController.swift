@@ -71,7 +71,7 @@ public final class ViewController             : NSViewController, RadioPickerDel
   private var _appFolderUrl                   : URL!
   private var _macros                         : Macros!
   private var _versions                       : (api: String, app: String)?
-  private var _clientId                       : UUID?
+  private var _clientId                       : String?
   
   // constants
   private let _dateFormatter                  = DateFormatter()
@@ -582,19 +582,13 @@ public final class ViewController             : NSViewController, RadioPickerDel
   ///
   /// - Returns:                a UUID
   ///
-  private func clientId() -> UUID {
-    var uuid : UUID
-    if let string = Defaults[.clientId] {
-      // use the stored string to create a UUID (if possible) else create a new UUID
-      uuid = UUID(uuidString: string) ?? UUID()
-    } else {
+  private func clientId() -> String {
+
+    if Defaults[.clientId] == nil {
       // none stored, create a new UUID
-      uuid = UUID()
-      Defaults[.clientId] = uuid.uuidString
+      Defaults[.clientId] = UUID().uuidString
     }
-    // store the string for later use
-    Defaults[.clientId] = uuid.uuidString
-    return uuid
+    return Defaults[.clientId]!
   }
   /// Copy selected rows from the array backing a table
   ///
