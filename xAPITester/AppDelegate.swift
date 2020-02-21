@@ -19,7 +19,6 @@ final class AppDelegate                     : NSObject, NSApplicationDelegate, L
     
   // App parameters
   static let kName                          = "xAPITester"
-  static let kVersion                       = Version()
   
   // Log parameters
   static let kLoggerName                    = AppDelegate.kName
@@ -30,6 +29,7 @@ final class AppDelegate                     : NSObject, NSApplicationDelegate, L
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
   
+  var version  : Version!
   var logLevel : XCGLogger.Level {
     // first parameter is complete executable path, second parameter is the logDebug flag (if present)
     if CommandLine.arguments.count >= 2 {
