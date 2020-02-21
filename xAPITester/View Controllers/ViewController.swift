@@ -107,6 +107,9 @@ public final class ViewController             : NSViewController, RadioPickerDel
     // give the Api access to our logger
     Log.sharedInstance.delegate = (NSApp.delegate as! AppDelegate)
     
+    // get my version
+    (NSApp.delegate as! AppDelegate).version = Version()
+
     addNotifications()
     
     // get/create a Client Id
@@ -669,12 +672,12 @@ public final class ViewController             : NSViewController, RadioPickerDel
     // are we connected?
     if let radio = _api.radio {
       // Yes, format and set the window title
-      title = "\(radio.discoveryPacket.nickname) @ \(radio.discoveryPacket.publicIp) (v\(radio.version.string) \(_api.isWan ? "SmartLink" : "Local"))       xAPITester (v\(AppDelegate.kVersion.string))       xLib6000 (v\(Api.kVersion.string))"
+      title = "\(radio.discoveryPacket.nickname) @ \(radio.discoveryPacket.publicIp) v\(radio.version.longString) (\(_api.isWan ? "SmartLink" : "Local"))       xAPITester v\((NSApp.delegate as! AppDelegate).version.longString)       xLib6000 v\(Api.kVersion.longString)"
 
     } else {
       // Log it before connecting
-      self._log.logMessage( "\(AppDelegate.kName) v\(AppDelegate.kVersion.string), \(Api.kName) v\(Api.kVersion.string)", .info, #function, #file, #line)
-      title = "\(AppDelegate.kName) v\(AppDelegate.kVersion.string)     \(Api.kName) v\(Api.kVersion.string)"
+      self._log.logMessage( "\(AppDelegate.kName) v\((NSApp.delegate as! AppDelegate).version.longString), \(Api.kName) v\(Api.kVersion.longString)", .info, #function, #file, #line)
+      title = "\(AppDelegate.kName) v\((NSApp.delegate as! AppDelegate).version.longString)     \(Api.kName) v\(Api.kVersion.longString)"
     }
     // set the title bar
     DispatchQueue.main.async {
