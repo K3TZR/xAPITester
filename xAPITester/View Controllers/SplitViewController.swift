@@ -349,9 +349,14 @@ class SplitViewController: NSSplitViewController, ApiDelegate, NSTableViewDelega
           
           // IQ Streams for this Panadapter
           for (_, iqStream) in radio.iqStreams where panadapter.id == iqStream.pan {
-            self.showInObjectsTable("      DaxIq          id = \(iqStream.id.hex)")
+            self.showInObjectsTable("      Iq             id = \(iqStream.id.hex)")
           }
-          
+
+          // Dax IQ Streams for this Panadapter
+          for (_, daxIqStream) in radio.daxIqStreams where panadapter.id == daxIqStream.pan {
+            self.showInObjectsTable("      DaxIq          id = \(daxIqStream.id.hex)")
+          }
+
           // Slices for this Panadapter
           for (_, slice) in radio.slices where panadapter.id == slice.panadapterId {
             self.showInObjectsTable("      Slice          id = \(slice.id)  pan = \(slice.panadapterId.hex)  frequency = \(slice.frequency.hzToMhz)  filterLow = \(slice.filterLow)  filterHigh = \(slice.filterHigh)  active = \(slice.active)  locked = \(slice.locked)")
@@ -359,10 +364,17 @@ class SplitViewController: NSSplitViewController, ApiDelegate, NSTableViewDelega
             // Audio Stream for this Slice
             for (_, audioStream) in radio.audioStreams {
               if audioStream.slice?.id == slice.id {
-                self.showInObjectsTable("           DaxAudio       id = \(audioStream.id.hex) stream")
+                self.showInObjectsTable("           Audio          id = \(audioStream.id.hex) stream")
               }
             }
-            
+
+            // Dax Rx Audio Stream for this Slice
+            for (_, daxRxAudioStream) in radio.daxRxAudioStreams {
+              if daxRxAudioStream.slice?.id == slice.id {
+                self.showInObjectsTable("           DaxAudio       id = \(daxRxAudioStream.id.hex) stream")
+              }
+            }
+
             // sort the Meters for this Slice
             for (_, meter) in radio.meters.sorted(by: { $0.value.id < $1.value.id }) {
               if meter.source == "slc" && meter.group == String(slice.id) {
@@ -375,6 +387,21 @@ class SplitViewController: NSSplitViewController, ApiDelegate, NSTableViewDelega
         for (_, txAudioStream) in radio.txAudioStreams {
           self.showInObjectsTable("Tx Audio       id = \(txAudioStream.id.hex)")
         }
+
+        // Dax Tx Audio Streams
+        for (_, daxTxAudioStream) in radio.daxTxAudioStreams {
+          self.showInObjectsTable("Dax Tx Audio   id = \(daxTxAudioStream.id.hex)")
+        }
+
+        // RemoteTx Audio Streams
+        for (_, remoteTxAudioStream) in radio.remoteTxAudioStreams {
+          self.showInObjectsTable("RemoteTx Audio id = \(remoteTxAudioStream.id.hex)")
+        }
+
+        // RemoteRx Audio Streams
+        for (_, remoteRxAudioStream) in radio.remoteRxAudioStreams {
+          self.showInObjectsTable("RemoteRx Audio id = \(remoteRxAudioStream.id.hex)")
+        }
         
         // Opus Streams
         for (_, opusStream) in radio.opusStreams {
@@ -383,13 +410,34 @@ class SplitViewController: NSSplitViewController, ApiDelegate, NSTableViewDelega
         
         // IQ Streams without a Panadapter
         for (_, iqStream) in radio.iqStreams where iqStream.pan == 0 {
-          self.showInObjectsTable("DaxIq          id = \(iqStream.id.hex)  panadapter = -not assigned-")
+          self.showInObjectsTable("Iq             id = \(iqStream.id.hex)  panadapter = -not assigned-")
         }
         
+        // Dax IQ Streams without a Panadapter
+        for (_, daxIqStream) in radio.daxIqStreams where daxIqStream.pan == 0 {
+          self.showInObjectsTable("DaxIq          id = \(daxIqStream.id.hex)  panadapter = -not assigned-")
+        }
+
         // Audio Stream without a Slice
         for (_, audioStream) in radio.audioStreams where audioStream.slice == nil {
-          self.showInObjectsTable("DaxAudio       id = \(audioStream.id.hex)  slice = -not assigned-")
+          self.showInObjectsTable("Audio          id = \(audioStream.id.hex)  slice = -not assigned-")
         }
+
+        // Dax Rx Audio Stream without a Slice
+        for (_, daxRxAudioStream) in radio.daxRxAudioStreams where daxRxAudioStream.slice == nil {
+          self.showInObjectsTable("DaxRxAudio     id = \(daxRxAudioStream.id.hex)  slice = -not assigned-")
+        }
+        
+        // Mic Audio Stream
+        for (_, micAudioStream) in radio.micAudioStreams {
+          self.showInObjectsTable("MicAudio       id = \(micAudioStream.id.hex)")
+        }
+        
+        // Dax Mic Audio Stream
+        for (_, daxMicAudioStream) in radio.daxMicAudioStreams {
+          self.showInObjectsTable("DaxMicAudio    id = \(daxMicAudioStream.id.hex)")
+        }
+        
         // Tnfs
         for (_, tnf) in radio.tnfs {
           self.showInObjectsTable("Tnf            id = \(tnf.id)  frequency = \(tnf.frequency)  width = \(tnf.width)  depth = \(tnf.depth)  permanent = \(tnf.permanent)")
@@ -418,10 +466,6 @@ class SplitViewController: NSSplitViewController, ApiDelegate, NSTableViewDelega
 //        for (_, meter) in sortedMeters where !meter.source.hasPrefix("slc") {
         for (_, meter) in sortedMeters where !meter.source.hasPrefix("slc") {
           self.showInObjectsTable("Meter          source = \(meter.source[0..<3])  group = \(("00" + meter.group).suffix(3))  id = \(meter.id)  name = \(meter.name)  desc = \(meter.desc)  units = \(meter.units)  low = \(meter.low)  high = \(meter.high)  fps = \(meter.fps)")
-        }
-        // Mic Audio Stream
-        for (_, micAudioStream) in radio.micAudioStreams {
-          self.showInObjectsTable("DaxMicAudio    \(micAudioStream.id.hex) stream")
         }
       }
     }
