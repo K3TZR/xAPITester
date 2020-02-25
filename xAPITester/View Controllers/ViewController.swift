@@ -871,7 +871,7 @@ public final class ViewController             : NSViewController, RadioPickerDel
       if _api.connect(selectedRadio,
                       clientStation: station,
                       programName: AppDelegate.kName,
-                      clientId: _clientId,
+                      clientId: Defaults[.isGui] ? _clientId : nil,
                       isGui: Defaults[.isGui],
                       isWan: isWan,
                       wanHandle: wanHandle) {
