@@ -349,36 +349,36 @@ class SplitViewController: NSSplitViewController, ApiDelegate, NSTableViewDelega
           
           // IQ Streams for this Panadapter
           for (_, iqStream) in radio.iqStreams where panadapter.id == iqStream.pan {
-            self.showInObjectsTable("      Iq             id = \(iqStream.id.hex)")
+            self.showInObjectsTable("      Iq          id = \(iqStream.id.hex)")
           }
 
           // Dax IQ Streams for this Panadapter
           for (_, daxIqStream) in radio.daxIqStreams where panadapter.id == daxIqStream.pan {
-            self.showInObjectsTable("      DaxIq          id = \(daxIqStream.id.hex)")
+            self.showInObjectsTable("      DaxIq       id = \(daxIqStream.id.hex)")
           }
 
           // Slices for this Panadapter
           for (_, slice) in radio.slices where panadapter.id == slice.panadapterId {
-            self.showInObjectsTable("      Slice          id = \(slice.id)  pan = \(slice.panadapterId.hex)  frequency = \(slice.frequency.hzToMhz)  filterLow = \(slice.filterLow)  filterHigh = \(slice.filterHigh)  active = \(slice.active)  locked = \(slice.locked)")
-            
+            self.showInObjectsTable("      Slice       id = \(slice.id)  pan = \(slice.panadapterId.hex)  frequency = \(slice.frequency.hzToMhz)  filterLow = \(slice.filterLow)  filterHigh = \(slice.filterHigh)  active = \(slice.active)  locked = \(slice.locked)")
+
             // Audio Stream for this Slice
             for (_, audioStream) in radio.audioStreams {
               if audioStream.slice?.id == slice.id {
-                self.showInObjectsTable("           Audio          id = \(audioStream.id.hex) stream")
+                self.showInObjectsTable("          Audio       id = \(audioStream.id.hex) stream")
               }
             }
 
             // Dax Rx Audio Stream for this Slice
             for (_, daxRxAudioStream) in radio.daxRxAudioStreams {
               if daxRxAudioStream.slice?.id == slice.id {
-                self.showInObjectsTable("           DaxAudio       id = \(daxRxAudioStream.id.hex) stream")
+                self.showInObjectsTable("          DaxAudio    id = \(daxRxAudioStream.id.hex) stream")
               }
             }
 
             // sort the Meters for this Slice
             for (_, meter) in radio.meters.sorted(by: { $0.value.id < $1.value.id }) {
               if meter.source == "slc" && meter.group == String(slice.id) {
-              self.showInObjectsTable("           Meter id = \(meter.id)  name = \(meter.name)  desc = \(meter.desc)  units = \(meter.units)  low = \(meter.low)  high = \(meter.high)  fps = \(meter.fps)")
+              self.showInObjectsTable("          Meter id = \(meter.id)  name = \(meter.name)  desc = \(meter.desc)  units = \(meter.units)  low = \(meter.low)  high = \(meter.high)  fps = \(meter.fps)")
               }
             }            
           }
