@@ -404,8 +404,8 @@ class SplitViewController: NSSplitViewController, ApiDelegate, NSTableViewDelega
         }
         
         // Opus Streams
-        for (_, opusStream) in radio.opusStreams {
-          self.showInObjectsTable("Opus           id = \(opusStream.id.hex)  rx = \(opusStream.rxEnabled)  rx stopped = \(opusStream.rxStopped)  tx = \(opusStream.txEnabled)")
+        for (_, opusAudioStream) in radio.opusAudioStreams {
+          self.showInObjectsTable("Opus           id = \(opusAudioStream.id.hex)  rx = \(opusAudioStream.rxEnabled)  rx stopped = \(opusAudioStream.rxStopped)  tx = \(opusAudioStream.txEnabled)")
         }
         
         // IQ Streams without a Panadapter
@@ -473,7 +473,7 @@ class SplitViewController: NSSplitViewController, ApiDelegate, NSTableViewDelega
 
   private func removeAllStreams() {
     
-    Api.sharedInstance.radio!.opusStreams.removeAll()
+    Api.sharedInstance.radio!.opusAudioStreams.removeAll()
   }
 
   // ----------------------------------------------------------------------------
