@@ -89,8 +89,6 @@ class SplitViewController: NSSplitViewController, ApiDelegate, NSTableViewDelega
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  typealias ClientData = (id: String, localPtt: Bool)
-  
   private var _api                            : Api {return Api.sharedInstance}          // Api to the Radio
   private let _log                            = NSApp.delegate as! AppDelegate
   internal weak var _parent                   : ViewController?
@@ -102,7 +100,7 @@ class SplitViewController: NSSplitViewController, ApiDelegate, NSTableViewDelega
   private var _replyHandlers                  = [SequenceNumber: ReplyTuple]()  // Dictionary of pending replies
   private var _messages                       = [String]()                  // backing storage for the table
   private var _objects                        = [String]()                  // backing storage for the objects table
-  private var _clientDict                     = [Handle:ClientData]()
+  private var _handles                        = [Handle]()
   
   private var _timeoutTimer                   : DispatchSourceTimer!          // timer fired every "checkInterval"
   private var _timerQ                         = DispatchQueue(label: "xAPITester" + ".timerQ")
@@ -334,11 +332,11 @@ class SplitViewController: NSSplitViewController, ApiDelegate, NSTableViewDelega
       
       // Radio
       if let radio = Api.sharedInstance.radio {
-        
-        for (handle, clientData) in self._clientDict {
-          self.showInObjectsTable("Client         handle = \(handle.hex)  id = \(clientData.id)  localPtt = \(clientData.localPtt)")
-        }
                 
+        for client in radio.discoveryPacket.guiClients {
+          self.showInObjectsTable("Client         station = \(client.station)  handle = \(client.handle.hex)  id = \(client.clientId ?? "unknown")  localPtt = \(client.isLocalPtt)  available = \(radio.discoveryPacket.guiClients.count < 2)  program = \(client.program)")
+        }
+        
         self.showInObjectsTable("Radio          name = \(radio.nickname)  model = \(radio.discoveryPacket.model), version = \(radio.version.longString)" +
           ", atu = \(Api.sharedInstance.radio!.atuPresent ? "Yes" : "No"), gps = \(Api.sharedInstance.radio!.gpsPresent ? "Yes" : "No")" +
           ", scu's = \(Api.sharedInstance.radio!.numberOfScus)")
@@ -523,28 +521,26 @@ class SplitViewController: NSSplitViewController, ApiDelegate, NSTableViewDelega
       // format: <apiHandle>|<message>, where <message> is of the form: <msgType> <otherMessageComponents>
       
       let components = text.split(separator: "|")
-      if components[1].hasPrefix("client") && components[1].contains("disconnected"){
+      if components[1].hasPrefix("client") && components[1].contains("disconnected") {
         
         removeAllStreams()
       }
-      
-      // capture the handles
       if components[1].hasPrefix("client") {
-        
         let parts = String(components[1]).keyValuesArray()
         
-        // keep a list of the Client Handles seen
+        // get the handle
         if let handle = parts[1].key.handle {
           
-          self._clientDict[handle] = (parts[4].value, parts[3].value.bValue)
-          
-          DispatchQueue.main.async { [weak self] in
-            // update the dropdown list
-            self?._parent!._showHandles.addItem(withTitle: handle.hex)
+          if !_handles.contains(handle) {
+            _handles.append(handle)
+            
+            DispatchQueue.main.async { [weak self] in
+              // update the dropdown list
+              self?._parent!._showHandles.addItem(withTitle: handle.hex)
+            }
           }
         }
       }
-      
       showInTable(text)
       
     case "V":   // Version Type
