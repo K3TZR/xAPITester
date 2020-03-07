@@ -521,22 +521,30 @@ class SplitViewController: NSSplitViewController, ApiDelegate, NSTableViewDelega
       // format: <apiHandle>|<message>, where <message> is of the form: <msgType> <otherMessageComponents>
       
       let components = text.split(separator: "|")
-      if components[1].hasPrefix("client") && components[1].contains("disconnected") {
-        
-        removeAllStreams()
-      }
       if components[1].hasPrefix("client") {
         let parts = String(components[1]).keyValuesArray()
         
         // get the handle
         if let handle = parts[1].key.handle {
           
-          if !_handles.contains(handle) {
-            _handles.append(handle)
+          if components[1].contains("disconnected") {
+            removeAllStreams()
             
-            DispatchQueue.main.async { [weak self] in
-              // update the dropdown list
-              self?._parent!._showHandles.addItem(withTitle: handle.hex)
+            if _handles.contains(handle) {
+              DispatchQueue.main.async { [weak self] in
+                // remove it from the dropdown list
+                self?._parent!._showHandles.removeItem(withTitle: handle.hex)
+              }
+            }
+          } else {
+            
+            if !_handles.contains(handle) {
+              _handles.append(handle)
+              
+              DispatchQueue.main.async { [weak self] in
+                // add it to the dropdown list
+                self?._parent!._showHandles.addItem(withTitle: handle.hex)
+              }
             }
           }
         }
