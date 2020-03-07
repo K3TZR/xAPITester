@@ -52,8 +52,9 @@ public final class ViewController             : NSViewController, RadioPickerDel
   @IBOutlet weak internal var _sendButton     : NSButton!
   @IBOutlet weak internal var _filterBy       : NSPopUpButton!
   @IBOutlet weak internal var _filterObjectsBy: NSPopUpButton!
-  @IBOutlet weak internal var _streamId       : NSTextField!
+//  @IBOutlet weak internal var _streamId       : NSTextField!
   @IBOutlet weak internal var _localRemote    : NSTextField!
+  @IBOutlet weak internal var _showHandles    : NSPopUpButton!
   
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
@@ -132,7 +133,7 @@ public final class ViewController             : NSViewController, RadioPickerDel
     title()
     
     // color the text field to match the kMyHandleColor
-    _streamId.backgroundColor = NSColor.systemPink.withAlphaComponent(0.1)
+//    _streamId.backgroundColor = NSColor.systemPink.withAlphaComponent(0.1)
 
     // get / create the Application Support folder
     _appFolderUrl = FileManager.appFolder

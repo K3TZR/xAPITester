@@ -89,6 +89,8 @@ class SplitViewController: NSSplitViewController, ApiDelegate, NSTableViewDelega
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
+  typealias ClientData = (id: String, localPtt: Bool)
+  
   private var _api                            : Api {return Api.sharedInstance}          // Api to the Radio
   private let _log                            = NSApp.delegate as! AppDelegate
   internal weak var _parent                   : ViewController?
@@ -100,7 +102,8 @@ class SplitViewController: NSSplitViewController, ApiDelegate, NSTableViewDelega
   private var _replyHandlers                  = [SequenceNumber: ReplyTuple]()  // Dictionary of pending replies
   private var _messages                       = [String]()                  // backing storage for the table
   private var _objects                        = [String]()                  // backing storage for the objects table
-
+  private var _clientDict                     = [Handle:ClientData]()
+  
   private var _timeoutTimer                   : DispatchSourceTimer!          // timer fired every "checkInterval"
   private var _timerQ                         = DispatchQueue(label: "xAPITester" + ".timerQ")
 
@@ -331,51 +334,54 @@ class SplitViewController: NSSplitViewController, ApiDelegate, NSTableViewDelega
       
       // Radio
       if let radio = Api.sharedInstance.radio {
-
-//        Swift.print("APITESTER: Panadapters = \(radio.panadapters.count), Waterfalls = \(radio.waterfalls.count)")
-
-        self.showInObjectsTable("Radio          name = \(radio.nickname)  model = \(radio.discoveryPacket.model), version = \(radio.discoveryPacket.firmwareVersion)" +
+        
+        for (handle, clientData) in self._clientDict {
+          self.showInObjectsTable("Client         handle = \(handle.hex)  id = \(clientData.id)  localPtt = \(clientData.localPtt)")
+        }
+                
+        self.showInObjectsTable("Radio          name = \(radio.nickname)  model = \(radio.discoveryPacket.model), version = \(radio.version.longString)" +
           ", atu = \(Api.sharedInstance.radio!.atuPresent ? "Yes" : "No"), gps = \(Api.sharedInstance.radio!.gpsPresent ? "Yes" : "No")" +
           ", scu's = \(Api.sharedInstance.radio!.numberOfScus)")
-        
-        // Panadapters
+                
+        // Panadapters & its accompanying objects
         for (_, panadapter) in radio.panadapters {
-          self.showInObjectsTable("Panadapter     id = \(panadapter.id.hex)  center = \(panadapter.center.hzToMhz)  bandwidth = \(panadapter.bandwidth.hzToMhz)")
+
+          if self._parent!._showHandles.titleOfSelectedItem != "All" {
+            if panadapter.clientHandle != self._parent!._showHandles.titleOfSelectedItem!.handle { continue }
+          }
+
+          self.showInObjectsTable("Panadapter     client = \(panadapter.clientHandle.hex)  id = \(panadapter.id.hex)  center = \(panadapter.center.hzToMhz)  bandwidth = \(panadapter.bandwidth.hzToMhz)")
           
-          // Waterfall for this Panadapter
+          // Waterfall
           for (_, waterfall) in radio.waterfalls where panadapter.id == waterfall.panadapterId {
             self.showInObjectsTable("      Waterfall   id = \(waterfall.id.hex)  autoBlackEnabled = \(waterfall.autoBlackEnabled),  colorGain = \(waterfall.colorGain),  blackLevel = \(waterfall.blackLevel),  duration = \(waterfall.lineDuration)")
           }
           
-          // IQ Streams for this Panadapter
+          // IQ Streams
           for (_, iqStream) in radio.iqStreams where panadapter.id == iqStream.pan {
             self.showInObjectsTable("      Iq          id = \(iqStream.id.hex)")
           }
 
-          // Dax IQ Streams for this Panadapter
+          // Dax IQ Streams
           for (_, daxIqStream) in radio.daxIqStreams where panadapter.id == daxIqStream.pan {
             self.showInObjectsTable("      DaxIq       id = \(daxIqStream.id.hex)")
           }
 
-          // Slices for this Panadapter
+          // Slice(s) & their accompanying objects
           for (_, slice) in radio.slices where panadapter.id == slice.panadapterId {
-            self.showInObjectsTable("      Slice       id = \(slice.id)  pan = \(slice.panadapterId.hex)  frequency = \(slice.frequency.hzToMhz)  filterLow = \(slice.filterLow)  filterHigh = \(slice.filterHigh)  active = \(slice.active)  locked = \(slice.locked)")
+            self.showInObjectsTable("      Slice       id = \(slice.id)  frequency = \(slice.frequency.hzToMhz)  filterLow = \(slice.filterLow)  filterHigh = \(slice.filterHigh)  active = \(slice.active)  locked = \(slice.locked)")
 
-            // Audio Stream for this Slice
-            for (_, audioStream) in radio.audioStreams {
-              if audioStream.slice?.id == slice.id {
-                self.showInObjectsTable("          Audio       id = \(audioStream.id.hex) stream")
-              }
+            // Audio Stream
+            for (_, audioStream) in radio.audioStreams where audioStream.slice?.id == slice.id {
+              self.showInObjectsTable("          Audio       id = \(audioStream.id.hex) stream")
             }
 
-            // Dax Rx Audio Stream for this Slice
-            for (_, daxRxAudioStream) in radio.daxRxAudioStreams {
-              if daxRxAudioStream.slice?.id == slice.id {
-                self.showInObjectsTable("          DaxAudio    id = \(daxRxAudioStream.id.hex) stream")
-              }
+            // Dax Rx Audio Stream
+            for (_, daxRxAudioStream) in radio.daxRxAudioStreams where daxRxAudioStream.slice?.id == slice.id {
+              self.showInObjectsTable("          DaxAudio    id = \(daxRxAudioStream.id.hex) stream")
             }
 
-            // sort the Meters for this Slice
+            // Meters
             for (_, meter) in radio.meters.sorted(by: { $0.value.id < $1.value.id }) {
               if meter.source == "slc" && meter.group == String(slice.id) {
               self.showInObjectsTable("          Meter id = \(meter.id)  name = \(meter.name)  desc = \(meter.desc)  units = \(meter.units)  low = \(meter.low)  high = \(meter.high)  fps = \(meter.fps)")
@@ -385,22 +391,22 @@ class SplitViewController: NSSplitViewController, ApiDelegate, NSTableViewDelega
         }
         // Tx Audio Streams
         for (_, txAudioStream) in radio.txAudioStreams {
-          self.showInObjectsTable("Tx Audio       id = \(txAudioStream.id.hex)")
+          self.showInObjectsTable("Tx Audio       id = \(txAudioStream.id.hex)  client = \(txAudioStream.clientHandle.hex)")
         }
 
         // Dax Tx Audio Streams
         for (_, daxTxAudioStream) in radio.daxTxAudioStreams {
-          self.showInObjectsTable("Dax Tx Audio   id = \(daxTxAudioStream.id.hex)")
+          self.showInObjectsTable("Dax Tx Audio   id = \(daxTxAudioStream.id.hex)  client = \(daxTxAudioStream.clientHandle.hex)")
         }
 
         // RemoteTx Audio Streams
         for (_, remoteTxAudioStream) in radio.remoteTxAudioStreams {
-          self.showInObjectsTable("RemoteTx Audio id = \(remoteTxAudioStream.id.hex)")
+          self.showInObjectsTable("RemoteTx Audio id = \(remoteTxAudioStream.id.hex)  client = \(remoteTxAudioStream.clientHandle.hex)")
         }
 
         // RemoteRx Audio Streams
         for (_, remoteRxAudioStream) in radio.remoteRxAudioStreams {
-          self.showInObjectsTable("RemoteRx Audio id = \(remoteRxAudioStream.id.hex)")
+          self.showInObjectsTable("RemoteRx Audio id = \(remoteRxAudioStream.id.hex)  client = \(remoteRxAudioStream.clientHandle.hex)")
         }
         
         // Opus Streams
@@ -408,34 +414,34 @@ class SplitViewController: NSSplitViewController, ApiDelegate, NSTableViewDelega
           self.showInObjectsTable("Opus           id = \(opusAudioStream.id.hex)  rx = \(opusAudioStream.rxEnabled)  rx stopped = \(opusAudioStream.rxStopped)  tx = \(opusAudioStream.txEnabled)")
         }
         
-        // IQ Streams without a Panadapter
+        // Other IQ Streams without a Panadapter
         for (_, iqStream) in radio.iqStreams where iqStream.pan == 0 {
-          self.showInObjectsTable("Iq             id = \(iqStream.id.hex)  panadapter = -not assigned-")
+          self.showInObjectsTable("Iq             id = \(iqStream.id.hex)  client = \(iqStream.clientHandle.hex)  panadapter = -not assigned-")
         }
         
-        // Dax IQ Streams without a Panadapter
+        // Other Dax IQ Streams without a Panadapter
         for (_, daxIqStream) in radio.daxIqStreams where daxIqStream.pan == 0 {
-          self.showInObjectsTable("DaxIq          id = \(daxIqStream.id.hex)  panadapter = -not assigned-")
+          self.showInObjectsTable("DaxIq          id = \(daxIqStream.id.hex)  client = \(daxIqStream.clientHandle.hex)  panadapter = -not assigned-")
         }
 
-        // Audio Stream without a Slice
+        // Other Audio Stream without a Slice
         for (_, audioStream) in radio.audioStreams where audioStream.slice == nil {
-          self.showInObjectsTable("Audio          id = \(audioStream.id.hex)  slice = -not assigned-")
+          self.showInObjectsTable("Audio          id = \(audioStream.id.hex)  client = \(audioStream.clientHandle.hex)  slice = -not assigned-")
         }
 
-        // Dax Rx Audio Stream without a Slice
+        // Other Dax Rx Audio Stream without a Slice
         for (_, daxRxAudioStream) in radio.daxRxAudioStreams where daxRxAudioStream.slice == nil {
-          self.showInObjectsTable("DaxRxAudio     id = \(daxRxAudioStream.id.hex)  slice = -not assigned-")
+          self.showInObjectsTable("DaxRxAudio     id = \(daxRxAudioStream.id.hex)  client = \(daxRxAudioStream.clientHandle.hex)  slice = -not assigned-")
         }
         
         // Mic Audio Stream
         for (_, micAudioStream) in radio.micAudioStreams {
-          self.showInObjectsTable("MicAudio       id = \(micAudioStream.id.hex)")
+          self.showInObjectsTable("MicAudio       id = \(micAudioStream.id.hex)  client = \(micAudioStream.clientHandle.hex)")
         }
         
         // Dax Mic Audio Stream
         for (_, daxMicAudioStream) in radio.daxMicAudioStreams {
-          self.showInObjectsTable("DaxMicAudio    id = \(daxMicAudioStream.id.hex)")
+          self.showInObjectsTable("DaxMicAudio    id = \(daxMicAudioStream.id.hex)  client = \(daxMicAudioStream.clientHandle.hex)")
         }
         
         // Tnfs
@@ -458,12 +464,11 @@ class SplitViewController: NSSplitViewController, ApiDelegate, NSTableViewDelega
         for (_, xvtr) in radio.xvtrs {
           self.showInObjectsTable("Xvtr           id = \(xvtr.id)  rf frequency = \(xvtr.rfFrequency.hzToMhz)  if frequency = \(xvtr.ifFrequency.hzToMhz)  valid = \(xvtr.isValid.asTrueFalse)")
         }
-        // Meters (not for a Slice)
+        // other Meters (non "slc")
         let sortedMeters = radio.meters.sorted(by: {
             ( $0.value.source[0..<3], Int($0.value.group.suffix(3), radix: 10)!, $0.value.id ) <
             ( $1.value.source[0..<3], Int($1.value.group.suffix(3), radix: 10)!, $1.value.id )
         })
-//        for (_, meter) in sortedMeters where !meter.source.hasPrefix("slc") {
         for (_, meter) in sortedMeters where !meter.source.hasPrefix("slc") {
           self.showInObjectsTable("Meter          source = \(meter.source[0..<3])  group = \(("00" + meter.group).suffix(3))  id = \(meter.id)  name = \(meter.name)  desc = \(meter.desc)  units = \(meter.units)  low = \(meter.low)  high = \(meter.high)  fps = \(meter.fps)")
         }
@@ -497,7 +502,7 @@ class SplitViewController: NSSplitViewController, ApiDelegate, NSTableViewDelega
     
     // get all except the first character
     let suffix = String(text.dropFirst())
-    
+
     // switch on the first character
     switch text[text.startIndex] {
       
@@ -505,14 +510,7 @@ class SplitViewController: NSSplitViewController, ApiDelegate, NSTableViewDelega
       showInTable(text)
       
     case "H":   // Handle type
-      // convert to drop leading zero (if any)
-      let numericHandle = Int( String(suffix), radix: 16 )
-      myHandle = String(format: "%X", numericHandle!)
-      
-      DispatchQueue.main.async { [unowned self] in
-        self._parent!._streamId.stringValue = self.myHandle
-      }
-      
+      myHandle = String(format: "%X", suffix.handle ?? 0)
       showInTable(text)
       
     case "M":   // Message Type
@@ -528,6 +526,23 @@ class SplitViewController: NSSplitViewController, ApiDelegate, NSTableViewDelega
       if components[1].hasPrefix("client") && components[1].contains("disconnected"){
         
         removeAllStreams()
+      }
+      
+      // capture the handles
+      if components[1].hasPrefix("client") {
+        
+        let parts = String(components[1]).keyValuesArray()
+        
+        // keep a list of the Client Handles seen
+        if let handle = parts[1].key.handle {
+          
+          self._clientDict[handle] = (parts[4].value, parts[3].value.bValue)
+          
+          DispatchQueue.main.async { [weak self] in
+            // update the dropdown list
+            self?._parent!._showHandles.addItem(withTitle: handle.hex)
+          }
+        }
       }
       
       showInTable(text)
