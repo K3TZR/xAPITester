@@ -100,7 +100,7 @@ class SplitViewController: NSSplitViewController, ApiDelegate, NSTableViewDelega
   private var _replyHandlers                  = [SequenceNumber: ReplyTuple]()  // Dictionary of pending replies
   private var _messages                       = [String]()                  // backing storage for the table
   private var _objects                        = [String]()                  // backing storage for the objects table
-  private var _handles                        = [Handle]()
+  private var _clientIds                      = [String]()
   
   private var _timeoutTimer                   : DispatchSourceTimer!          // timer fired every "checkInterval"
   private var _timerQ                         = DispatchQueue(label: "xAPITester" + ".timerQ")
@@ -328,11 +328,19 @@ class SplitViewController: NSSplitViewController, ApiDelegate, NSTableViewDelega
   private func refreshObjects() {
     
     DispatchQueue.main.async { [unowned self] in
-      self.objects.removeAll()
-      
+      var activeHandle : Handle = 0
+
       // Radio
       if let radio = Api.sharedInstance.radio {
-                
+        
+        if self._parent!._clientIds.titleOfSelectedItem != "All" {
+          
+          for client in radio.discoveryPacket.guiClients where client.clientId == self._parent?._clientIds.titleOfSelectedItem {
+            activeHandle = client.handle
+          }
+        }
+        self.objects.removeAll()
+        
         for client in radio.discoveryPacket.guiClients {
           self.showInObjectsTable("Client         station = \(client.station)  handle = \(client.handle.hex)  id = \(client.clientId ?? "unknown")  localPtt = \(client.isLocalPtt)  available = \(radio.discoveryPacket.guiClients.count < 2)  program = \(client.program)")
         }
@@ -340,14 +348,11 @@ class SplitViewController: NSSplitViewController, ApiDelegate, NSTableViewDelega
         self.showInObjectsTable("Radio          name = \(radio.nickname)  model = \(radio.discoveryPacket.model), version = \(radio.version.longString)" +
           ", atu = \(Api.sharedInstance.radio!.atuPresent ? "Yes" : "No"), gps = \(Api.sharedInstance.radio!.gpsPresent ? "Yes" : "No")" +
           ", scu's = \(Api.sharedInstance.radio!.numberOfScus)")
-                
+        
         // Panadapters & its accompanying objects
         for (_, panadapter) in radio.panadapters {
-
-          if self._parent!._showHandles.titleOfSelectedItem != "All" {
-            if panadapter.clientHandle != self._parent!._showHandles.titleOfSelectedItem!.handle { continue }
-          }
-
+          if activeHandle != 0 && panadapter.clientHandle != activeHandle { continue }
+          
           self.showInObjectsTable("Panadapter     client = \(panadapter.clientHandle.hex)  id = \(panadapter.id.hex)  center = \(panadapter.center.hzToMhz)  bandwidth = \(panadapter.bandwidth.hzToMhz)")
           
           // Waterfall
@@ -359,87 +364,87 @@ class SplitViewController: NSSplitViewController, ApiDelegate, NSTableViewDelega
           for (_, iqStream) in radio.iqStreams where panadapter.id == iqStream.pan {
             self.showInObjectsTable("      Iq          id = \(iqStream.id.hex)")
           }
-
+          
           // Dax IQ Streams
           for (_, daxIqStream) in radio.daxIqStreams where panadapter.id == daxIqStream.pan {
             self.showInObjectsTable("      DaxIq       id = \(daxIqStream.id.hex)")
           }
-
+          
           // Slice(s) & their accompanying objects
           for (_, slice) in radio.slices where panadapter.id == slice.panadapterId {
             self.showInObjectsTable("      Slice       id = \(slice.id)  frequency = \(slice.frequency.hzToMhz)  filterLow = \(slice.filterLow)  filterHigh = \(slice.filterHigh)  active = \(slice.active)  locked = \(slice.locked)")
-
+            
             // Audio Stream
-            for (_, audioStream) in radio.audioStreams where audioStream.slice?.id == slice.id {
-              self.showInObjectsTable("          Audio       id = \(audioStream.id.hex) stream")
+            for (_, stream) in radio.audioStreams where stream.slice?.id == slice.id {
+              self.showInObjectsTable("          Audio       id = \(stream.id.hex)  ip = \(stream.ip)  port = \(stream.port)")
             }
-
+            
             // Dax Rx Audio Stream
-            for (_, daxRxAudioStream) in radio.daxRxAudioStreams where daxRxAudioStream.slice?.id == slice.id {
-              self.showInObjectsTable("          DaxAudio    id = \(daxRxAudioStream.id.hex) stream")
+            for (_, stream) in radio.daxRxAudioStreams where stream.slice?.id == slice.id {
+              self.showInObjectsTable("          DaxAudio    id = \(stream.id.hex)  channel = \(stream.daxChannel)  ip = \(stream.ip)")
             }
-
+            
             // Meters
             for (_, meter) in radio.meters.sorted(by: { $0.value.id < $1.value.id }) {
               if meter.source == "slc" && meter.group == String(slice.id) {
-              self.showInObjectsTable("          Meter id = \(meter.id)  name = \(meter.name)  desc = \(meter.desc)  units = \(meter.units)  low = \(meter.low)  high = \(meter.high)  fps = \(meter.fps)")
+                self.showInObjectsTable("          Meter id = \(meter.id)  name = \(meter.name)  desc = \(meter.desc)  units = \(meter.units)  low = \(meter.low)  high = \(meter.high)  fps = \(meter.fps)")
               }
-            }            
+            }
           }
         }
         // Tx Audio Streams
-        for (_, txAudioStream) in radio.txAudioStreams {
-          self.showInObjectsTable("Tx Audio       id = \(txAudioStream.id.hex)  client = \(txAudioStream.clientHandle.hex)")
+        for (_, stream) in radio.txAudioStreams {
+          self.showInObjectsTable("Tx Audio       id = \(stream.id.hex)  handle = \(stream.clientHandle.hex)  transmit = \(stream.transmit)  ip = \(stream.ip)  port = \(stream.port)")
         }
-
+        
         // Dax Tx Audio Streams
-        for (_, daxTxAudioStream) in radio.daxTxAudioStreams {
-          self.showInObjectsTable("Dax Tx Audio   id = \(daxTxAudioStream.id.hex)  client = \(daxTxAudioStream.clientHandle.hex)")
+        for (_, stream) in radio.daxTxAudioStreams {
+          self.showInObjectsTable("Dax Tx Audio   id = \(stream.id.hex)  handle = \(stream.clientHandle.hex)  isTransmit = \(stream.isTransmitChannel)")
         }
-
+        
         // RemoteTx Audio Streams
-        for (_, remoteTxAudioStream) in radio.remoteTxAudioStreams {
-          self.showInObjectsTable("RemoteTx Audio id = \(remoteTxAudioStream.id.hex)  client = \(remoteTxAudioStream.clientHandle.hex)")
+        for (_, stream) in radio.remoteTxAudioStreams {
+          self.showInObjectsTable("RemoteTx Audio id = \(stream.id.hex)  handle = \(stream.clientHandle.hex)  compression = \(stream.compression)  ip = \(stream.ip)")
         }
-
+        
         // RemoteRx Audio Streams
-        for (_, remoteRxAudioStream) in radio.remoteRxAudioStreams {
-          self.showInObjectsTable("RemoteRx Audio id = \(remoteRxAudioStream.id.hex)  client = \(remoteRxAudioStream.clientHandle.hex)")
+        for (_, stream) in radio.remoteRxAudioStreams {
+          self.showInObjectsTable("RemoteRx Audio id = \(stream.id.hex)  handle = \(stream.clientHandle.hex)  compression = \(stream.compression)handle")
         }
         
         // Opus Streams
-        for (_, opusAudioStream) in radio.opusAudioStreams {
-          self.showInObjectsTable("Opus           id = \(opusAudioStream.id.hex)  rx = \(opusAudioStream.rxEnabled)  rx stopped = \(opusAudioStream.rxStopped)  tx = \(opusAudioStream.txEnabled)")
+        for (_, stream) in radio.opusAudioStreams {
+          self.showInObjectsTable("Opus           id = \(stream.id.hex)  rx = \(stream.rxEnabled)  rx stopped = \(stream.rxStopped)  tx = \(stream.txEnabled)  ip = \(stream.ip)  port = \(stream.port)")
         }
         
-        // Other IQ Streams without a Panadapter
-        for (_, iqStream) in radio.iqStreams where iqStream.pan == 0 {
-          self.showInObjectsTable("Iq             id = \(iqStream.id.hex)  client = \(iqStream.clientHandle.hex)  panadapter = -not assigned-")
+        // IQ Streams without a Panadapter
+        for (_, stream) in radio.iqStreams where stream.pan == 0 {
+          self.showInObjectsTable("Iq             id = \(stream.id.hex)  handle = \(stream.clientHandle.hex)  channel = \(stream.daxIqChannel)  rate = \(stream.rate)  ip = \(stream.ip)  panadapter = -not assigned-")
         }
         
-        // Other Dax IQ Streams without a Panadapter
-        for (_, daxIqStream) in radio.daxIqStreams where daxIqStream.pan == 0 {
-          self.showInObjectsTable("DaxIq          id = \(daxIqStream.id.hex)  client = \(daxIqStream.clientHandle.hex)  panadapter = -not assigned-")
+        // Dax IQ Streams without a Panadapter
+        for (_, stream) in radio.daxIqStreams where stream.pan == 0 {
+          self.showInObjectsTable("DaxIq          id = \(stream.id.hex)  handle = \(stream.clientHandle.hex)  channel = \(stream.channel)  rate = \(stream.rate)  ip = \(stream.ip)  panadapter = -not assigned-")
         }
 
-        // Other Audio Stream without a Slice
-        for (_, audioStream) in radio.audioStreams where audioStream.slice == nil {
-          self.showInObjectsTable("Audio          id = \(audioStream.id.hex)  client = \(audioStream.clientHandle.hex)  slice = -not assigned-")
+        // Audio Stream without a Slice
+        for (_, stream) in radio.audioStreams where stream.slice == nil {
+          self.showInObjectsTable("Audio          id = \(stream.id.hex)  handle = \(stream.clientHandle.hex)  ip = \(stream.ip)  port = \(stream.port)  slice = -not assigned-")
         }
 
-        // Other Dax Rx Audio Stream without a Slice
-        for (_, daxRxAudioStream) in radio.daxRxAudioStreams where daxRxAudioStream.slice == nil {
-          self.showInObjectsTable("DaxRxAudio     id = \(daxRxAudioStream.id.hex)  client = \(daxRxAudioStream.clientHandle.hex)  slice = -not assigned-")
+        // Dax Rx Audio Stream without a Slice
+        for (_, stream) in radio.daxRxAudioStreams where stream.slice == nil {
+          self.showInObjectsTable("DaxRxAudio     id = \(stream.id.hex)  handle = \(stream.clientHandle.hex)  channel = \(stream.daxChannel)  ip = \(stream.ip)  slice = -not assigned-")
         }
         
         // Mic Audio Stream
-        for (_, micAudioStream) in radio.micAudioStreams {
-          self.showInObjectsTable("MicAudio       id = \(micAudioStream.id.hex)  client = \(micAudioStream.clientHandle.hex)")
+        for (_, stream) in radio.micAudioStreams {
+          self.showInObjectsTable("MicAudio       id = \(stream.id.hex)  handle = \(stream.clientHandle.hex)  ip = \(stream.ip)  port = \(stream.port)")
         }
         
         // Dax Mic Audio Stream
-        for (_, daxMicAudioStream) in radio.daxMicAudioStreams {
-          self.showInObjectsTable("DaxMicAudio    id = \(daxMicAudioStream.id.hex)  client = \(daxMicAudioStream.clientHandle.hex)")
+        for (_, stream) in radio.daxMicAudioStreams {
+          self.showInObjectsTable("DaxMicAudio    id = \(stream.id.hex)  handle = \(stream.clientHandle.hex)  ip = \(stream.ip)")
         }
         
         // Tnfs
@@ -524,27 +529,31 @@ class SplitViewController: NSSplitViewController, ApiDelegate, NSTableViewDelega
       if components[1].hasPrefix("client") {
         let parts = String(components[1]).keyValuesArray()
         
-        // get the handle
-        if let handle = parts[1].key.handle {
+        // get the id
+        let clientId = parts[4].value
+        // is it being removed?
+        if components[1].contains("disconnected") {
           
-          if components[1].contains("disconnected") {
-            removeAllStreams()
-            
-            if _handles.contains(handle) {
-              DispatchQueue.main.async { [weak self] in
-                // remove it from the dropdown list
-                self?._parent!._showHandles.removeItem(withTitle: handle.hex)
-              }
+          // YES, remove it
+          removeAllStreams()
+          
+          if _clientIds.contains(clientId) {
+            DispatchQueue.main.async { [weak self] in
+              // remove it from the dropdown list
+              self?._parent!._clientIds.removeItem(withTitle: clientId)
+              self?._parent!._bindToClientIds.removeItem(withTitle: clientId)
             }
-          } else {
+          }
+        } else {
+          
+          // NO, add it
+          if !_clientIds.contains(clientId) {
+            _clientIds.append(clientId)
             
-            if !_handles.contains(handle) {
-              _handles.append(handle)
-              
-              DispatchQueue.main.async { [weak self] in
-                // add it to the dropdown list
-                self?._parent!._showHandles.addItem(withTitle: handle.hex)
-              }
+            DispatchQueue.main.async { [weak self] in
+              // add it to the dropdown list
+              self?._parent!._clientIds.addItem(withTitle: clientId)
+              self?._parent!._bindToClientIds.addItem(withTitle: clientId)
             }
           }
         }

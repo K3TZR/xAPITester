@@ -47,13 +47,16 @@ public final class ViewController             : NSViewController, RadioPickerDel
   private let _log                            = (NSApp.delegate as! AppDelegate)
   private var _radios                         : [DiscoveryStruct] { Discovery.sharedInstance.discoveredRadios }
 
-  @IBOutlet weak internal var _command        : NSTextField!
-  @IBOutlet weak internal var _connectButton  : NSButton!
-  @IBOutlet weak internal var _sendButton     : NSButton!
-  @IBOutlet weak internal var _filterBy       : NSPopUpButton!
-  @IBOutlet weak internal var _filterObjectsBy: NSPopUpButton!
-  @IBOutlet weak internal var _localRemote    : NSTextField!
-  @IBOutlet weak internal var _showHandles    : NSPopUpButton!
+  @IBOutlet weak internal var _command          : NSTextField!
+  @IBOutlet weak internal var _connectButton    : NSButton!
+  @IBOutlet weak internal var _sendButton       : NSButton!
+  @IBOutlet weak internal var _filterBy         : NSPopUpButton!
+  @IBOutlet weak internal var _filterObjectsBy  : NSPopUpButton!
+  @IBOutlet weak internal var _localRemote      : NSTextField!
+  @IBOutlet weak internal var _clientIds        : NSPopUpButton!
+  @IBOutlet weak internal var _guiState         : NSTextField!
+  @IBOutlet weak internal var _bindToLabel      : NSTextField!
+  @IBOutlet weak internal var _bindToClientIds  : NSPopUpButton!
   
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
@@ -134,6 +137,9 @@ public final class ViewController             : NSViewController, RadioPickerDel
     // get / create the Application Support folder
     _appFolderUrl = FileManager.appFolder
     
+    _clientIds.selectItem(withTitle: "All")
+    _bindToClientIds.selectItem(withTitle: "None")
+    
     let _ = Discovery.sharedInstance
   }
   override public func viewWillAppear() {
@@ -191,6 +197,10 @@ public final class ViewController             : NSViewController, RadioPickerDel
       
     case kConnect:
       
+      _guiState.stringValue = Defaults[.isGui] ? "GUI" : "Non-GUI"
+      _clientIds.isEnabled = Defaults[.isGui]
+      _bindToClientIds.isEnabled = !_clientIds.isEnabled
+
       // open the Default Radio (if any), otherwise open the Picker
       // is the default Radio available?
       if let defaultRadio = defaultRadioFound() {
@@ -211,6 +221,11 @@ public final class ViewController             : NSViewController, RadioPickerDel
 
     case kDisconnect:
       
+      _clientIds.isEnabled = false
+      _clientIds.selectItem(withTitle: "All")
+      _bindToClientIds.isEnabled = false
+      _bindToClientIds.selectItem(withTitle: "None")
+
       // close the active Radio
       closeRadio()
       
@@ -224,7 +239,8 @@ public final class ViewController             : NSViewController, RadioPickerDel
   ///
   @IBAction func connectAsGui(_ sender: NSButton) {
     
-    Defaults[.isGui] = (sender.state == NSControl.StateValue.on)
+    Defaults[.isGui] = sender.boolState
+    _guiState.stringValue = sender.boolState ? "GUI" : "Non-GUI"
   }
   /// Respond to the Copy button (in the Commands & Replies box)
   ///
@@ -513,6 +529,21 @@ public final class ViewController             : NSViewController, RadioPickerDel
     
     // force a redraw
     _splitViewVC?.reloadTable()
+  }
+  /// The ShowHandles PopUp changed
+  ///
+  /// - Parameter sender:     the popup
+  ///
+  @IBAction func updateShowHandles(_ sender: NSPopUpButton) {
+    
+    // force a redraw
+    _splitViewVC?.reloadTable()
+  }
+  @IBAction func updateBinding(_ sender: NSPopUpButton) {
+    // if a valid handle, bind to it
+    if sender.titleOfSelectedItem != "None" {
+      _api.radio?.boundClientId = sender.titleOfSelectedItem!
+    }
   }
   /// The FilterBy PopUp changed (in the Commands & Replies box)
   ///
