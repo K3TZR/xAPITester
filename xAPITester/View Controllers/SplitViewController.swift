@@ -90,9 +90,9 @@ class SplitViewController: NSSplitViewController, ApiDelegate, NSTableViewDelega
   // MARK: - Private properties
   
   private var _api                            : Api {return Api.sharedInstance}          // Api to the Radio
-  private let _log                            = NSApp.delegate as! AppDelegate
+  private let _log                            = Logger.sharedInstance
   internal weak var _parent                   : ViewController?
-  internal let _objectQ                       = DispatchQueue(label: AppDelegate.kName + ".objectQ", attributes: [.concurrent])
+  internal let _objectQ                       = DispatchQueue(label: Logger.kAppName + ".objectQ", attributes: [.concurrent])
   
   private var _font                           : NSFont!                     // font for table entries
   
@@ -105,7 +105,7 @@ class SplitViewController: NSSplitViewController, ApiDelegate, NSTableViewDelega
   private var _timeoutTimer                   : DispatchSourceTimer!          // timer fired every "checkInterval"
   private var _timerQ                         = DispatchQueue(label: "xAPITester" + ".timerQ")
 
-  private let kAutosaveName                   = NSSplitView.AutosaveName(AppDelegate.kName + "SplitView")
+  private let kAutosaveName                   = NSSplitView.AutosaveName(Logger.kAppName + "SplitView")
   private let checkInterval                   : TimeInterval = 1.0
   
   // ----------------------------------------------------------------------------
@@ -529,31 +529,33 @@ class SplitViewController: NSSplitViewController, ApiDelegate, NSTableViewDelega
       if components[1].hasPrefix("client") {
         let parts = String(components[1]).keyValuesArray()
         
-        // get the id
-        let clientId = parts[4].value
-        // is it being removed?
-        if components[1].contains("disconnected") {
-          
-          // YES, remove it
-          removeAllStreams()
-          
-          if _clientIds.contains(clientId) {
-            DispatchQueue.main.async { [weak self] in
-              // remove it from the dropdown list
-              self?._parent!._clientIds.removeItem(withTitle: clientId)
-              self?._parent!._bindToClientIds.removeItem(withTitle: clientId)
-            }
-          }
-        } else {
-          
-          // NO, add it
-          if !_clientIds.contains(clientId) {
-            _clientIds.append(clientId)
+        if _api.radio!.version.isNewApi {
+          // get the id
+          let clientId = parts[4].value
+          // is it being removed?
+          if components[1].contains("disconnected") {
             
-            DispatchQueue.main.async { [weak self] in
-              // add it to the dropdown list
-              self?._parent!._clientIds.addItem(withTitle: clientId)
-              self?._parent!._bindToClientIds.addItem(withTitle: clientId)
+            // YES, remove it
+            removeAllStreams()
+            
+            if _clientIds.contains(clientId) {
+              DispatchQueue.main.async { [weak self] in
+                // remove it from the dropdown list
+                self?._parent!._clientIds.removeItem(withTitle: clientId)
+                self?._parent!._bindToClientIds.removeItem(withTitle: clientId)
+              }
+            }
+          } else {
+            
+            // NO, add it
+            if !_clientIds.contains(clientId) {
+              _clientIds.append(clientId)
+              
+              DispatchQueue.main.async { [weak self] in
+                // add it to the dropdown list
+                self?._parent!._clientIds.addItem(withTitle: clientId)
+                self?._parent!._bindToClientIds.addItem(withTitle: clientId)
+              }
             }
           }
         }
