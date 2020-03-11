@@ -62,26 +62,29 @@ extension DefaultsKeys {
   static var useLowBw                 : DefaultsKey<Bool>     { return .init("useLowBw", defaultValue: false) }
 }
 
-extension FileManager {
+extension URL {
   
-  /// Get / create the Application Support folder
+  /// setup the Support folders
   ///
-  static var appFolder : URL {
+  static var appSupport : URL { return FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first! }
+  static var logs : URL { return createAsNeeded("Logs") }
+  static var macros : URL { return createAsNeeded("Macros") }
+  
+  static func createAsNeeded(_ folder: String) -> URL {
     let fileManager = FileManager.default
-    let urls = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask )
-    let appFolderUrl = urls.first!.appendingPathComponent( Bundle.main.bundleIdentifier! )
+    let folderUrl = appSupport.appendingPathComponent( folder )
     
     // does the folder exist?
-    if !fileManager.fileExists( atPath: appFolderUrl.path ) {
+    if fileManager.fileExists( atPath: folderUrl.path ) == false {
       
       // NO, create it
       do {
-        try fileManager.createDirectory( at: appFolderUrl, withIntermediateDirectories: false, attributes: nil)
+        try fileManager.createDirectory( at: folderUrl, withIntermediateDirectories: false, attributes: nil)
       } catch let error as NSError {
         fatalError("Error creating App Support folder: \(error.localizedDescription)")
       }
     }
-    return appFolderUrl
+    return folderUrl
   }
 }
 
