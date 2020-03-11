@@ -62,7 +62,7 @@ final class LANRadioPickerViewController    : NSViewController, NSTableViewDeleg
   
   private var _api                          = Api.sharedInstance
   private var _radios                       : [DiscoveryStruct] { return Discovery.sharedInstance.discoveredRadios }
-  private let _log                          = (NSApp.delegate as! AppDelegate)
+  private let _log                          = Logger.sharedInstance
   private var _selectedRadio                : DiscoveryStruct?            // Radio in selected row
   private weak var _parentVc                : NSViewController!
   
