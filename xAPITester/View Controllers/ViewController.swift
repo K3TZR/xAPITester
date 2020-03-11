@@ -44,7 +44,7 @@ public final class ViewController             : NSViewController, RadioPickerDel
   // MARK: - Private properties
   
   private var _api                            = Api.sharedInstance
-  private let _log                            = (NSApp.delegate as! AppDelegate)
+  private let _log                            = Logger.sharedInstance
   private var _radios                         : [DiscoveryStruct] { Discovery.sharedInstance.discoveredRadios }
 
   @IBOutlet weak internal var _command          : NSTextField!
@@ -108,10 +108,10 @@ public final class ViewController             : NSViewController, RadioPickerDel
     super.viewDidLoad()
     
     // give the Api access to our logger
-    Log.sharedInstance.delegate = (NSApp.delegate as! AppDelegate)
+    Log.sharedInstance.delegate = Logger.sharedInstance
     
     // get my version
-    (NSApp.delegate as! AppDelegate).version = Version()
+    Logger.sharedInstance.version = Version()
 
     addNotifications()
     
@@ -134,8 +134,8 @@ public final class ViewController             : NSViewController, RadioPickerDel
     // set the window title
     title()
     
-    // get / create the Application Support folder
-    _appFolderUrl = FileManager.appFolder
+//    // get / create the Application Support folder
+//    _appFolderUrl = FileManager.appFolder
     
     _clientIds.selectItem(withTitle: "All")
     _bindToClientIds.selectItem(withTitle: "None")
@@ -696,19 +696,20 @@ public final class ViewController             : NSViewController, RadioPickerDel
   /// Set the Window's title
   ///
   private func title() {
-    var title = ""
-    // are we connected?
-    if let radio = _api.radio {
-      // Yes, format and set the window title
-      title = "\(radio.discoveryPacket.nickname) @ \(radio.discoveryPacket.publicIp) v\(radio.version.longString) (\(_api.isWan ? "SmartLink" : "Local"))       xAPITester v\((NSApp.delegate as! AppDelegate).version.longString)       xLib6000 v\(Api.kVersion.longString)"
+    let mode = _api.isWan ? "SmartLink" : "Local"
 
-    } else {
-      // Log it before connecting
-      self._log.logMessage( "\(AppDelegate.kName) v\((NSApp.delegate as! AppDelegate).version.longString), \(Api.kName) v\(Api.kVersion.longString)", .info, #function, #file, #line)
-      title = "\(AppDelegate.kName) v\((NSApp.delegate as! AppDelegate).version.longString)     \(Api.kName) v\(Api.kVersion.longString)"
-    }
     // set the title bar
-    DispatchQueue.main.async {
+    DispatchQueue.main.async { [unowned self] in
+      var title = ""
+      // are we connected?
+      if let radio = self._api.radio {
+        // YES, format and set the window title
+        title = "\(radio.discoveryPacket.nickname) v\(radio.version.longString) @ \(radio.discoveryPacket.publicIp) \(mode)        \(Logger.kAppName) v\(Logger.sharedInstance.version.longString)       xLib6000 v\(Api.kVersion.longString)"
+
+      } else {
+        // NO, show App & Api only
+        title = "\(Logger.kAppName) v\(Logger.sharedInstance.version.longString)     \(Api.kName) v\(Api.kVersion.longString)"
+      }
       self.view.window?.title = title
     }
   }
@@ -721,6 +722,7 @@ public final class ViewController             : NSViewController, RadioPickerDel
   private func addNotifications() {
     
     NC.makeObserver(self, with: #selector(radioDowngrade(_:)), of: .radioDowngrade)
+    NC.makeObserver(self, with: #selector(clientDidDisconnect(_:)), of: .clientDidDisconnect)
   }
   /// Process .radioDowngrade Notification
   ///
@@ -735,14 +737,14 @@ public final class ViewController             : NSViewController, RadioPickerDel
     DispatchQueue.main.async {
       let alert = NSAlert()
       alert.alertStyle = .warning
-      alert.messageText = "The Radio's version may not be supported by this version of \(AppDelegate.kName)."
+      alert.messageText = "The Radio's version may not be supported by this version of \(Logger.kAppName)."
       alert.informativeText = """
       Radio:\t\tv\(versions[1].longString)
       xLib6000:\tv\(versions[0].string)
       
       You can use SmartSDR to DOWNGRADE the Radio
       \t\t\tOR
-      Install a newer version of \(AppDelegate.kName)
+      Install a newer version of \(Logger.kAppName)
       """
       alert.addButton(withTitle: "Close")
       alert.addButton(withTitle: "Continue")
@@ -753,36 +755,15 @@ public final class ViewController             : NSViewController, RadioPickerDel
       })
     }
   }
-  /// Process .radioUpgrade Notification
+  /// Process .radioDowngrade Notification
   ///
   /// - Parameter note:         a Notification instance
   ///
-//  @objc private func radioUpgrade(_ note: Notification) {
-//
-//    let versions = note.object as! [Version]
-//
-//    // the API version is later than the Radio version
-//    DispatchQueue.main.async {
-//      let alert = NSAlert()
-//      alert.alertStyle = .warning
-//      alert.messageText = "The Radio's version may not be supported by this version of \(AppDelegate.kName)."
-//      alert.informativeText = """
-//      Radio:\t\tv\(versions[1].longString)
-//      xLib6000:\tv\(versions[0].string)
-//
-//      You can use SmartSDR to UPGRADE the Radio
-//      \t\t\tOR
-//      Install an older version of \(AppDelegate.kName)
-//      """
-//      alert.addButton(withTitle: "Close")
-//      alert.addButton(withTitle: "Continue")
-//      alert.beginSheetModal(for: self.view.window!, completionHandler: { (response) in
-//        if response == NSApplication.ModalResponse.alertFirstButtonReturn {
-//          NSApp.terminate(self)
-//        }
-//      })
-//    }
-//  }
+  @objc private func clientDidDisconnect(_ note: Notification) {
+    DispatchQueue.main.async { [unowned self] in
+      if self._connectButton.identifier == self.kDisconnect { self._connectButton.performClick(self) }
+    }
+  }
 
   // ----------------------------------------------------------------------------
   // MARK: - RadioPickerDelegate methods
@@ -898,7 +879,7 @@ public final class ViewController             : NSViewController, RadioPickerDel
       let station = (Host.current().localizedName ?? "Mac").replacingSpaces(with: "_")
       if _api.connect(selectedRadio,
                       clientStation: station,
-                      programName: AppDelegate.kName,
+                      programName: Logger.kAppName,
                       clientId: Defaults[.isGui] ? _clientId : nil,
                       isGui: Defaults[.isGui],
                       isWan: isWan,
@@ -911,6 +892,9 @@ public final class ViewController             : NSViewController, RadioPickerDel
         self._connectButton.identifier = self.kDisconnect
         self._sendButton.isEnabled = true
         title()
+        
+        self._clientIds.isEnabled = _api.radio!.version.isNewApi && Defaults[.isGui]
+        self._bindToClientIds.isEnabled = _api.radio!.version.isNewApi && !Defaults[.isGui]
         
         return true
       }
