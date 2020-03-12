@@ -57,6 +57,7 @@ public final class ViewController             : NSViewController, RadioPickerDel
   @IBOutlet weak internal var _guiState         : NSTextField!
   @IBOutlet weak internal var _bindToLabel      : NSTextField!
   @IBOutlet weak internal var _bindToClientIds  : NSPopUpButton!
+  @IBOutlet weak internal var _apiType          : NSTextField!
   
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
@@ -225,6 +226,10 @@ public final class ViewController             : NSViewController, RadioPickerDel
       _clientIds.selectItem(withTitle: "All")
       _bindToClientIds.isEnabled = false
       _bindToClientIds.selectItem(withTitle: "None")
+     
+      _localRemote.stringValue = ""
+      _guiState.stringValue = ""
+      _apiType.stringValue = ""
 
       // close the active Radio
       closeRadio()
@@ -240,7 +245,6 @@ public final class ViewController             : NSViewController, RadioPickerDel
   @IBAction func connectAsGui(_ sender: NSButton) {
     
     Defaults[.isGui] = sender.boolState
-    _guiState.stringValue = sender.boolState ? "GUI" : "Non-GUI"
   }
   /// Respond to the Copy button (in the Commands & Replies box)
   ///
@@ -861,16 +865,6 @@ public final class ViewController             : NSViewController, RadioPickerDel
       _splitViewVC?.objects.removeAll()
       _splitViewVC?._objectsTableView.reloadData()
       
-      // WAN connect
-      if isWan {
-        _localRemote.stringValue = kRemote
-        _api.isWan = true
-        _api.connectionHandleWan = wanHandle
-      } else {
-        _localRemote.stringValue = kLocal
-        _api.isWan = false
-        _api.connectionHandleWan = ""
-      }
       
       // if not a GUI connection, allow the Tester to see all stream objects
       _api.testerModeEnabled = !Defaults[.isGui]
@@ -892,6 +886,19 @@ public final class ViewController             : NSViewController, RadioPickerDel
         self._connectButton.identifier = self.kDisconnect
         self._sendButton.isEnabled = true
         title()
+
+        // WAN connect
+        if isWan {
+          _api.isWan = true
+          _api.connectionHandleWan = wanHandle
+        } else {
+          _api.isWan = false
+          _api.connectionHandleWan = ""
+        }
+
+        self._localRemote.stringValue = isWan ? kRemote : kLocal
+        self._guiState.stringValue = Defaults[.isGui] ? "Gui" : "Non-Gui"
+        self._apiType.stringValue = _api.radio!.version.isOldApi ? "Old API" : "New API"
         
         self._clientIds.isEnabled = _api.radio!.version.isNewApi && Defaults[.isGui]
         self._bindToClientIds.isEnabled = _api.radio!.version.isNewApi && !Defaults[.isGui]
