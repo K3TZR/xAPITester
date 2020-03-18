@@ -345,9 +345,9 @@ class SplitViewController: NSSplitViewController, ApiDelegate, NSTableViewDelega
           self.showInObjectsTable("Client         station = \(client.station)  handle = \(client.handle.hex)  id = \(client.clientId ?? "unknown")  localPtt = \(client.isLocalPtt)  available = \(radio.discoveryPacket.guiClients.count < 2)  program = \(client.program)")
         }
         
-        self.showInObjectsTable("Radio          name = \(radio.nickname)  model = \(radio.discoveryPacket.model), version = \(radio.version.longString)" +
-          ", atu = \(Api.sharedInstance.radio!.atuPresent ? "Yes" : "No"), gps = \(Api.sharedInstance.radio!.gpsPresent ? "Yes" : "No")" +
-          ", scu's = \(Api.sharedInstance.radio!.numberOfScus)")
+        self.showInObjectsTable("Radio          name = \(radio.nickname)  model = \(radio.discoveryPacket.model)  ip = \(radio.discoveryPacket.publicIp)" +
+          "  atu = \(Api.sharedInstance.radio!.atuPresent ? "Yes" : "No")  gps = \(Api.sharedInstance.radio!.gpsPresent ? "Yes" : "No")" +
+          "  scu's = \(Api.sharedInstance.radio!.numberOfScus)")
         
         // Panadapters & its accompanying objects
         for (_, panadapter) in radio.panadapters {
@@ -419,7 +419,7 @@ class SplitViewController: NSSplitViewController, ApiDelegate, NSTableViewDelega
         
         // IQ Streams without a Panadapter
         for (_, stream) in radio.iqStreams where stream.pan == 0 {
-          self.showInObjectsTable("Iq             id = \(stream.id.hex)  handle = \(stream.clientHandle.hex)  channel = \(stream.daxIqChannel)  rate = \(stream.rate)  ip = \(stream.ip)  panadapter = -not assigned-")
+          self.showInObjectsTable("Iq             id = \(stream.id.hex)  channel = \(stream.daxIqChannel)  rate = \(stream.rate)  ip = \(stream.ip)  panadapter = -not assigned-")
         }
         
         // Dax IQ Streams without a Panadapter
@@ -429,7 +429,7 @@ class SplitViewController: NSSplitViewController, ApiDelegate, NSTableViewDelega
 
         // Audio Stream without a Slice
         for (_, stream) in radio.audioStreams where stream.slice == nil {
-          self.showInObjectsTable("Audio          id = \(stream.id.hex)  handle = \(stream.clientHandle.hex)  ip = \(stream.ip)  port = \(stream.port)  slice = -not assigned-")
+          self.showInObjectsTable("Audio          id = \(stream.id.hex)  ip = \(stream.ip)  port = \(stream.port)  slice = -not assigned-")
         }
 
         // Dax Rx Audio Stream without a Slice

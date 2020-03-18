@@ -700,7 +700,6 @@ public final class ViewController             : NSViewController, RadioPickerDel
   /// Set the Window's title
   ///
   private func title() {
-    let mode = _api.isWan ? "SmartLink" : "Local"
 
     // set the title bar
     DispatchQueue.main.async { [unowned self] in
@@ -708,11 +707,11 @@ public final class ViewController             : NSViewController, RadioPickerDel
       // are we connected?
       if let radio = self._api.radio {
         // YES, format and set the window title
-        title = "\(radio.discoveryPacket.nickname) v\(radio.version.longString) @ \(radio.discoveryPacket.publicIp) \(mode)        \(Logger.kAppName) v\(Logger.sharedInstance.version.longString)       xLib6000 v\(Api.kVersion.longString)"
+        title = "\(radio.discoveryPacket.nickname) v\(radio.version.longString)         \(Logger.kAppName) v\(Logger.sharedInstance.version.string)       xLib6000 " + versionOf("xLib6000")
 
       } else {
         // NO, show App & Api only
-        title = "\(Logger.kAppName) v\(Logger.sharedInstance.version.longString)     \(Api.kName) v\(Api.kVersion.longString)"
+        title = "\(Logger.kAppName) v\(Logger.sharedInstance.version.string)     \(Api.kName) " + versionOf("xLib6000")
       }
       self.view.window?.title = title
     }
