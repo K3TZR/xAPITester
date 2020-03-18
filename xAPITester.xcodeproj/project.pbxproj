@@ -35,10 +35,11 @@
 		9187259F23D63ED9009B63A3 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9187259B23D63ED9009B63A3 /* ViewController.swift */; };
 		918725A023D63ED9009B63A3 /* HelpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9187259C23D63ED9009B63A3 /* HelpViewController.swift */; };
 		918725A123D63ED9009B63A3 /* SplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9187259D23D63ED9009B63A3 /* SplitViewController.swift */; };
+		919F57DE24193D40001956B0 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 919F57DD24193D40001956B0 /* Logger.swift */; };
+		91B1D25224205B9D00A7B5E4 /* Package.resolved in Resources */ = {isa = PBXBuildFile; fileRef = 91B1D25124205B9C00A7B5E4 /* Package.resolved */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		910DBC6523EDFC9200052637 /* xLib6000 */ = {isa = PBXFileReference; lastKnownFileType = folder; name = xLib6000; path = ../xLib6000; sourceTree = "<group>"; };
 		9187255723D63C8A009B63A3 /* xAPITester.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = xAPITester.pdf; sourceTree = "<group>"; };
 		9187255A23D63C8A009B63A3 /* Defaults.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Defaults.plist; sourceTree = "<group>"; };
 		9187255B23D63C8A009B63A3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -66,6 +67,8 @@
 		9187259C23D63ED9009B63A3 /* HelpViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HelpViewController.swift; sourceTree = "<group>"; };
 		9187259D23D63ED9009B63A3 /* SplitViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SplitViewController.swift; sourceTree = "<group>"; };
 		9196148623D1372D0069AE94 /* xAPITester.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = xAPITester.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		919F57DD24193D40001956B0 /* Logger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
+		91B1D25124205B9C00A7B5E4 /* Package.resolved */ = {isa = PBXFileReference; lastKnownFileType = text; path = Package.resolved; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -86,6 +89,7 @@
 		9187255523D63C8A009B63A3 /* xAPITester */ = {
 			isa = PBXGroup;
 			children = (
+				91B1D25124205B9C00A7B5E4 /* Package.resolved */,
 				9187256423D63C8A009B63A3 /* xAPITester.entitlements */,
 				9187256823D63C8A009B63A3 /* Info.plist */,
 				9187255B23D63C8A009B63A3 /* Assets.xcassets */,
@@ -189,6 +193,7 @@
 		918725A623D8B342009B63A3 /* Supporting */ = {
 			isa = PBXGroup;
 			children = (
+				919F57DD24193D40001956B0 /* Logger.swift */,
 				9187255A23D63C8A009B63A3 /* Defaults.plist */,
 			);
 			path = Supporting;
@@ -197,7 +202,6 @@
 		9196147D23D1372D0069AE94 = {
 			isa = PBXGroup;
 			children = (
-				910DBC6523EDFC9200052637 /* xLib6000 */,
 				9187259623D63D35009B63A3 /* ChangeLog.txt */,
 				9187259423D63CD1009B63A3 /* README.md */,
 				9187255523D63C8A009B63A3 /* xAPITester */,
@@ -230,6 +234,7 @@
 			buildPhases = (
 				9196148223D1372D0069AE94 /* Sources */,
 				9196148323D1372D0069AE94 /* Frameworks */,
+				91B1D25324205DF200A7B5E4 /* ShellScript */,
 				9196148423D1372D0069AE94 /* Resources */,
 				910DBC6623F1009600052637 /* ShellScript */,
 			);
@@ -294,6 +299,7 @@
 			files = (
 				9187259923D63D8F009B63A3 /* Main.storyboard in Resources */,
 				9187257B23D63C8A009B63A3 /* xAPITester.pdf in Resources */,
+				91B1D25224205B9D00A7B5E4 /* Package.resolved in Resources */,
 				9187259723D63D35009B63A3 /* ChangeLog.txt in Resources */,
 				9187257E23D63C8A009B63A3 /* Assets.xcassets in Resources */,
 				9187257D23D63C8A009B63A3 /* Defaults.plist in Resources */,
@@ -321,6 +327,23 @@
 			shellPath = /bin/sh;
 			shellScript = "#!/bin/sh\n\n# To make executable, use: chmod u+x Build-Versioning-Scripts/Increment_Build_Number.sh\n# to locate your target's info.plist use\n# ${PRODUCT_SETTINGS_PATH}\n\necho \"----\"\necho \"Info.plist for target: ${PRODUCT_SETTINGS_PATH}\"\n\nbuildNum=$(/usr/libexec/Plistbuddy -c \"Print CFBundleVersion\" \"${PRODUCT_SETTINGS_PATH}\")\necho \"Current build #: $buildNum\"\n\nif [ -z \"$buildNum\" ]; then\necho \"No build number found in $PRODUCT_SETTINGS_PATH\"\nexit 2\nfi\n\nbuildNum=$(expr $buildNum + 1)\necho \"Build # incremented to: $buildNum\"\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $buildNum\" \"$PRODUCT_SETTINGS_PATH\"\necho \"----\"\nexit 0\n";
 		};
+		91B1D25324205DF200A7B5E4 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "echo \"Source: ${PROJECT_DIR}/xAPITester.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved\"\necho \"Destination: ${PROJECT_DIR}/Package.resolved\"\ncp \"${PROJECT_DIR}/xAPITester.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved\" \"${PROJECT_DIR}/Package.resolved\"\n";
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -328,6 +351,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				919F57DE24193D40001956B0 /* Logger.swift in Sources */,
 				9187259E23D63ED9009B63A3 /* MeterViewController.swift in Sources */,
 				9187259323D63C8A009B63A3 /* Macros.swift in Sources */,
 				9187259223D63C8A009B63A3 /* LANRadioPickerViewController.swift in Sources */,
@@ -473,7 +497,7 @@
 				CODE_SIGN_ENTITLEMENTS = xAPITester/xAPITester.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_TEAM = EE5B8TYXGA;
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -486,7 +510,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = net.k3tzr.xAPITester;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -503,7 +527,7 @@
 				CODE_SIGN_ENTITLEMENTS = xAPITester/xAPITester.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_TEAM = EE5B8TYXGA;
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -516,7 +540,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = net.k3tzr.xAPITester;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
