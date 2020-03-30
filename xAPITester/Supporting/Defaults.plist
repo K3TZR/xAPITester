@@ -60,5 +60,7 @@
 	<string></string>
 	<key>defaultRadioSerialNumber</key>
 	<string></string>
+	<key>smartLinkWasLoggedIn</key>
+	<false/>
 </dict>
 </plist>

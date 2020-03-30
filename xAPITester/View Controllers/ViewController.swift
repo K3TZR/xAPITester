@@ -26,7 +26,7 @@ protocol RadioPickerDelegate: class {
   ///   - handle:             remote handle
   /// - Returns:              success / failure
   ///
-  func openRadio(_ radio: DiscoveryStruct?, isWan: Bool, wanHandle: String) -> Bool
+  func openRadio(_ radio: DiscoveryStruct?, isWan: Bool, wanHandle: String, pendingDisconnect: Handle?) -> Bool
   
   /// Close the active Radio
   ///
@@ -38,7 +38,6 @@ protocol RadioPickerDelegate: class {
 // ------------------------------------------------------------------------------
 
 public final class ViewController             : NSViewController, RadioPickerDelegate,  NSTextFieldDelegate {
-  
   
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
@@ -207,7 +206,7 @@ public final class ViewController             : NSViewController, RadioPickerDel
       if let defaultRadio = defaultRadioFound() {
         
         // YES, open the default radio
-        if !openRadio(defaultRadio) {
+        if !openRadio(defaultRadio, pendingDisconnect: nil) {
           _log.logMessage("Error opening default radio, \(defaultRadio.nickname)", .warning, #function, #file, #line)
 
           // open the Radio Picker
@@ -848,7 +847,7 @@ public final class ViewController             : NSViewController, RadioPickerDel
     ///   - wanHandle:            Wan handle (if any)
     /// - Returns:                success / failure
     ///
-    func openRadio(_ discoveredRadio: DiscoveryStruct?, isWan: Bool = false, wanHandle: String = "") -> Bool {
+  func openRadio(_ discoveredRadio: DiscoveryStruct?, isWan: Bool = false, wanHandle: String = "", pendingDisconnect: Handle? = nil) -> Bool {
       
       if let _ = _radioPickerTabViewController {
         self._radioPickerTabViewController = nil
@@ -876,7 +875,8 @@ public final class ViewController             : NSViewController, RadioPickerDel
                       clientId: Defaults[.isGui] ? _clientId : nil,
                       isGui: Defaults[.isGui],
                       isWan: isWan,
-                      wanHandle: wanHandle) {
+                      wanHandle: wanHandle,
+                      pendingDisconnect: pendingDisconnect) {
         
         
         _startTimestamp = Date()

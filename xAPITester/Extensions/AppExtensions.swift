@@ -17,19 +17,6 @@ typealias NC = NotificationCenter
 // ----------------------------------------------------------------------------
 // MARK: - Definitions for SwiftyUserDefaults
 
-//extension UserDefaults {
-//
-//  subscript(key: DefaultsKey<NSColor>) -> NSColor {
-//    get { return unarchive(key)! }
-//    set { archive(key, newValue) }
-//  }
-//
-//  public subscript(key: DefaultsKey<CGFloat>) -> CGFloat {
-//    get { return CGFloat(numberForKey(key._key)?.doubleValue ?? 0.0) }
-//    set { set(key, Double(newValue)) }
-//  }
-//}
-
 // defaults keys (for values in defaults.plist)
 extension DefaultsKeys {
   
@@ -58,6 +45,7 @@ extension DefaultsKeys {
   static var smartLinkAuth0Email      : DefaultsKey<String>   { return .init("smartLinkAuth0Email", defaultValue: "") }
   static var smartLinkToken           : DefaultsKey<String?>  { return .init("smartLinkToken") }
   static var smartLinkTokenExpiry     : DefaultsKey<Date?>    { return .init("smartLinkTokenExpiry") }
+  static var smartLinkWasLoggedIn     : DefaultsKey<Bool>     { return .init("smartLinkWasLoggedIn", defaultValue: false) }
   static var suppressUdp              : DefaultsKey<Bool>     { return .init("suppressUdp", defaultValue: false) }
   static var useLowBw                 : DefaultsKey<Bool>     { return .init("useLowBw", defaultValue: false) }
 }
@@ -151,6 +139,19 @@ public extension String {
     // must have 4 values containing 4 numbers & 0 <= number < 256
     return parts.count == 4 && nums.count == 4 && nums.filter { $0 >= 0 && $0 < 256}.count == 4
   }
+}
+
+extension String{
+   static func random(length:Int)->String{
+        let letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+        var randomString = ""
+
+        while randomString.utf8.count < length{
+            let randomLetter = letters.randomElement()
+            randomString += randomLetter?.description ?? ""
+        }
+        return randomString
+    }
 }
 
 // ----------------------------------------------------------------------------
