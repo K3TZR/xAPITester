@@ -78,8 +78,8 @@ If you require a Mac-based Voice Keyer , please see.
 
 [![W6OP](https://img.shields.io/badge/W6OP-Voice_Keyer-informational)](https://w6op.com)
 
-## 1.0.11 Release Notes
+## 1.1.0 Release Notes
 
-* Changes to work with 1.2.9 xLib6000
+* Uses xLib6000 1.2.9
 * Removed from Sandbox
 * Incorporate changes to RadioPickers & Auth0ViewController for SmartLink log on/off corrections
