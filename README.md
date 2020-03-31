@@ -80,6 +80,6 @@ If you require a Mac-based Voice Keyer , please see.
 
 ## 1.0.11 Release Notes
 
-Changes to work with 1.2.9 xLib6000
-Removed from Sandbox
-Incorporate changes to RadioPickers & Auth0ViewController for SmartLink log on/off corrections
+* Changes to work with 1.2.9 xLib6000
+* Removed from Sandbox
+* Incorporate changes to RadioPickers & Auth0ViewController for SmartLink log on/off corrections
