@@ -3,7 +3,7 @@
 # xAPITester
 
 ## API Explorer for the FlexRadio (TM) 6000 series software defined radios.
-###      (currently supports Radios with Version3.1.8 or lower, see Evolution below)
+###      (currently supports Radios with Version 3.1.8 or lower, see Evolution below)
 
 ### Built on:
 
@@ -78,8 +78,7 @@ If you require a Mac-based Voice Keyer , please see.
 
 [![W6OP](https://img.shields.io/badge/W6OP-Voice_Keyer-informational)](https://w6op.com)
 
-## 1.1.0 Release Notes
+## 1.1.2 Release Notes
 
-* Uses xLib6000 1.2.9
-* Removed from Sandbox
-* Incorporate changes to RadioPickers & Auth0ViewController for SmartLink log on/off corrections
+* Uses xLib6000 1.2.10
+* Options for Multiflex connections

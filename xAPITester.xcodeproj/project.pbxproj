@@ -29,7 +29,6 @@
 		9187259223D63C8A009B63A3 /* LANRadioPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9187257823D63C8A009B63A3 /* LANRadioPickerViewController.swift */; };
 		9187259323D63C8A009B63A3 /* Macros.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9187257A23D63C8A009B63A3 /* Macros.swift */; };
 		9187259523D63CD1009B63A3 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 9187259423D63CD1009B63A3 /* README.md */; };
-		9187259723D63D35009B63A3 /* ChangeLog.txt in Resources */ = {isa = PBXBuildFile; fileRef = 9187259623D63D35009B63A3 /* ChangeLog.txt */; };
 		9187259923D63D8F009B63A3 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9187259823D63D8F009B63A3 /* Main.storyboard */; };
 		9187259E23D63ED9009B63A3 /* MeterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9187259A23D63ED9009B63A3 /* MeterViewController.swift */; };
 		9187259F23D63ED9009B63A3 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9187259B23D63ED9009B63A3 /* ViewController.swift */; };
@@ -60,7 +59,6 @@
 		9187257823D63C8A009B63A3 /* LANRadioPickerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LANRadioPickerViewController.swift; sourceTree = "<group>"; };
 		9187257A23D63C8A009B63A3 /* Macros.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Macros.swift; sourceTree = "<group>"; };
 		9187259423D63CD1009B63A3 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		9187259623D63D35009B63A3 /* ChangeLog.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ChangeLog.txt; sourceTree = "<group>"; };
 		9187259823D63D8F009B63A3 /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 		9187259A23D63ED9009B63A3 /* MeterViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MeterViewController.swift; sourceTree = "<group>"; };
 		9187259B23D63ED9009B63A3 /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -202,7 +200,6 @@
 		9196147D23D1372D0069AE94 = {
 			isa = PBXGroup;
 			children = (
-				9187259623D63D35009B63A3 /* ChangeLog.txt */,
 				9187259423D63CD1009B63A3 /* README.md */,
 				9187255523D63C8A009B63A3 /* xAPITester */,
 				9196148723D1372D0069AE94 /* Products */,
@@ -234,7 +231,7 @@
 			buildPhases = (
 				9196148223D1372D0069AE94 /* Sources */,
 				9196148323D1372D0069AE94 /* Frameworks */,
-				91B1D25324205DF200A7B5E4 /* ShellScript */,
+				91B1D25324205DF200A7B5E4 /* Copy Package.resolved */,
 				9196148423D1372D0069AE94 /* Resources */,
 				910DBC6623F1009600052637 /* Increment Build Number */,
 			);
@@ -300,7 +297,6 @@
 				9187259923D63D8F009B63A3 /* Main.storyboard in Resources */,
 				9187257B23D63C8A009B63A3 /* xAPITester.pdf in Resources */,
 				91B1D25224205B9D00A7B5E4 /* Package.resolved in Resources */,
-				9187259723D63D35009B63A3 /* ChangeLog.txt in Resources */,
 				9187257E23D63C8A009B63A3 /* Assets.xcassets in Resources */,
 				9187257D23D63C8A009B63A3 /* Defaults.plist in Resources */,
 				9187259523D63CD1009B63A3 /* README.md in Resources */,
@@ -328,7 +324,7 @@
 			shellPath = /bin/sh;
 			shellScript = "#!/bin/sh\n\n# To make executable, use: chmod u+x Build-Versioning-Scripts/Increment_Build_Number.sh\n# to locate your target's info.plist use\n# ${PROJECT_DIR}/${INFOPLIST_FILE}\n\necho \"----\"\nbuildNumber=${CURRENT_PROJECT_VERSION}\necho \"Current Build #: $buildNumber\"\n\nbuildNumber=$(($buildNumber + 1))\necho \"Build # incremented to: $buildNumber\"\n\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $buildNumber\" \"${PROJECT_DIR}/${INFOPLIST_FILE}\"\necho \"----\"\nexit 0\n";
 		};
-		91B1D25324205DF200A7B5E4 /* ShellScript */ = {
+		91B1D25324205DF200A7B5E4 /* Copy Package.resolved */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -337,6 +333,7 @@
 			);
 			inputPaths = (
 			);
+			name = "Copy Package.resolved";
 			outputFileListPaths = (
 			);
 			outputPaths = (
@@ -499,7 +496,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 0;
 				DEVELOPMENT_TEAM = EE5B8TYXGA;
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -512,7 +509,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 1.1.0;
+				MARKETING_VERSION = 1.1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = net.k3tzr.xAPITester;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -530,7 +527,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 0;
 				DEVELOPMENT_TEAM = EE5B8TYXGA;
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -543,7 +540,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 1.1.0;
+				MARKETING_VERSION = 1.1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = net.k3tzr.xAPITester;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -580,7 +577,7 @@
 			repositoryURL = "https://github.com/K3TZR/xLib6000.git";
 			requirement = {
 				kind = exactVersion;
-				version = 1.2.9;
+				version = 1.2.10;
 			};
 		};
 		917AAA8323D5EDC80082FAEB /* XCRemoteSwiftPackageReference "XCGLogger" */ = {

@@ -246,8 +246,8 @@ final class WANRadioPickerViewController    : NSViewController, NSTableViewDeleg
   ///
   @IBAction func selectButton( _: AnyObject ) {
     
-    // attempt to Open / Close the selected Radio
-    openClose()
+    // attempt to Connect / Disconnect the selected Radio
+    connectDisconnect()
   }
   /// Respond to the Login button
   ///
@@ -271,51 +271,76 @@ final class WANRadioPickerViewController    : NSViewController, NSTableViewDeleg
   // ----------------------------------------------------------------------------
   // MARK: - Private methods
   
-    private func openClose() {
-      
-      guard let discoveryPacket = _discoveryPacket else { return }
-      
-      _discoveryPacket!.lowBandwidthConnect = Defaults[.lowBandwidthEnabled]
-      
-      // Connect / Disconnect
-      if _selectButton.title == kConnectTitle {
-        
-        // CONNECT, is the selected radio connected to another client?
-        switch (discoveryPacket.status, discoveryPacket.guiClients.count) {
-          
-        case ("Available", 0):    // not connected to another client
-          openRadio()
-          
-        case ("Available", _):    // connected to another client, should the client be closed?
-          let alert = NSAlert()
-          alert.alertStyle = .warning
-          alert.messageText = "Radio is connected to Station: \(discoveryPacket.guiClients[0].station)"
-  //        alert.informativeText = "Station: \(discoveryPacket.guiClients[0].station)?"
-          alert.addButton(withTitle: "Disconnect \(discoveryPacket.guiClients[0].station)")
-          alert.addButton(withTitle: "Connect using Multiflex")
-          alert.addButton(withTitle: "Cancel")
+//  private func connectDisconnect() {
+//
+//    guard let discoveryPacket = _discoveryPacket else { return }
+//
+//    _discoveryPacket!.lowBandwidthConnect = Defaults[.lowBandwidthEnabled]
+//
+//    // Connect / Disconnect
+//    if _selectButton.title == kConnectTitle {
+//
+//      // CONNECT, is the selected radio connected to another client?
+//      switch (discoveryPacket.status, discoveryPacket.guiClients.count) {
+//
+//      case ("Available", 0):    // not connected to another client
+//        openRadio()
+//
+//      case ("Available", _):    // connected to another client, should the client be closed?
+//        let alert = NSAlert()
+//        alert.alertStyle = .warning
+//        alert.messageText = "Radio is connected to Station: \(discoveryPacket.guiClients[0].station)"
+//        //        alert.informativeText = "Station: \(discoveryPacket.guiClients[0].station)?"
+//        alert.addButton(withTitle: "Disconnect \(discoveryPacket.guiClients[0].station)")
+//        alert.addButton(withTitle: "Connect using Multiflex")
+//        alert.addButton(withTitle: "Cancel")
+//
+//        // ignore if not confirmed by the user
+//        alert.beginSheetModal(for: view.window!, completionHandler: { (response) in
+//          // close the connected Radio if the YES button pressed
+//
+//          switch response {
+//          //            case NSApplication.ModalResponse.alertFirstButtonReturn:  self.openRadio(discoveryPacket, pendingDisconnect: discoveryPacket.guiClients[0].handle)
+//          case NSApplication.ModalResponse.alertFirstButtonReturn:  break
+//          case NSApplication.ModalResponse.alertSecondButtonReturn: self.openRadio()
+//          default:  return
+//          }
+//        })
+//
+//      default:
+//        Swift.print("????")
+//      }
+//
+//    } else {  // DISCONNECT, RadioPicker remains open
+//      _delegate?.closeRadio()
+//      _selectButton.title = kConnectTitle
+//    }
+//  }
+  
+  /// Connect / Disconnect a Radio
+  ///
+  private func connectDisconnect() {
+    
+    guard let discoveryPacket = _discoveryPacket else { return }
+    guard let delegate = _delegate else { return }
 
-          // ignore if not confirmed by the user
-          alert.beginSheetModal(for: view.window!, completionHandler: { (response) in
-            // close the connected Radio if the YES button pressed
-            
-            switch response {
-//            case NSApplication.ModalResponse.alertFirstButtonReturn:  self.openRadio(discoveryPacket, pendingDisconnect: discoveryPacket.guiClients[0].handle)
-            case NSApplication.ModalResponse.alertFirstButtonReturn:  break
-            case NSApplication.ModalResponse.alertSecondButtonReturn: self.openRadio()
-            default:  return
-            }
-          })
-
-        default:
-          Swift.print("????")
-        }
+    // Connect / Disconnect
+    if _selectButton.title == kConnectTitle {
       
-      } else {  // DISCONNECT, RadioPicker remains open
-        _delegate?.closeRadio()
-        _selectButton.title = kConnectTitle
+      // CONNECT
+      openRadio()
+      
+      // close the picker
+      DispatchQueue.main.async { [unowned self] in
+        self.closeButton(self)
       }
+      
+    } else {
+      // DISCONNECT, RadioPicker remains open
+      delegate.closeRadio()
     }
+  }
+
   /// Open or Close the selected Radio
   ///
   /// - Parameter lowBW: open the remote radio with low bandwith settings
@@ -670,19 +695,8 @@ final class WANRadioPickerViewController    : NSViewController, NSTableViewDeleg
       
       guard self._discoveryPacket?.serialNumber == serial, self._delegate != nil else { return }
         
-      // FIXME: pendingDisconnect
-      
-        // tell the delegate to connect to the selected Radio
-      if !(self._delegate!.openRadio(self._discoveryPacket, isWan: true, wanHandle: handle, pendingDisconnect: nil) ) {
-
-          // log the event
-          self._log.logMessage("Open remote radio FAILED: \(self._discoveryPacket!.nickname) @ \(self._discoveryPacket!.publicIp)", .error, #function, #file, #line)
-        }
-//        else {
-//
-//        // log the error
-//        self._log.logMessage("Unexpected serial number mismatch in wanRadioConnectReady(), \(self._selectedDiscoveryPacket!.serialNumber) vs \(serial)", .error, #function, #file, #line)
-//      }
+      // tell the delegate to connect to the selected Radio
+      self._delegate!.openRadio(self._discoveryPacket!, isWan: true, wanHandle: handle)
     }
   }
   
