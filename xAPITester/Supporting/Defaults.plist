@@ -8,6 +8,8 @@
 	<string>&quot;&quot;</string>
 	<key>clearAtConnect</key>
 	<true/>
+	<key>clearAtDisconnect</key>
+	<true/>
 	<key>clearOnSend</key>
 	<false/>
 	<key>commandColor</key>

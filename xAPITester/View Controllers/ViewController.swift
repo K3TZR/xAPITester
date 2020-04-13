@@ -449,7 +449,7 @@ public final class ViewController             : NSViewController, RadioPickerDel
         // parse the condition
         let evaluatedCommand = _macros.parse(cmd)
         
-        // was the condition was satisfied?
+        // was the condition satisfied?
         if evaluatedCommand.active {
           
           // YES, send the command
@@ -527,15 +527,16 @@ public final class ViewController             : NSViewController, RadioPickerDel
   @IBAction func updateBinding(_ sender: NSPopUpButton) {
     
     func findClientId(for station: String) -> String? {
-      for (_, radioPacket) in Discovery.sharedInstance.discoveredRadios.enumerated() {
-        for (_, guiClient) in radioPacket.guiClients.enumerated() {
-          if guiClient.station == station { return guiClient.clientId }
-        }
+      for guiClient in _api.radio!.discoveryPacket.guiClients where guiClient.station == station {
+        return guiClient.clientId
       }
       return nil
     }
     // if a valid handle, bind to it
-    if sender.titleOfSelectedItem != "None" {
+    if sender.titleOfSelectedItem == "None" {
+      _api.radio?.boundClientId = ""
+
+    } else {
       if let clientId = findClientId(for: sender.titleOfSelectedItem!) {
         _api.radio?.boundClientId = clientId
       }
@@ -864,7 +865,7 @@ public final class ViewController             : NSViewController, RadioPickerDel
     let status = discoveryPacket.status.lowercased()
     let guiCount = discoveryPacket.guiClients.count
     let isNewApi = Version(discoveryPacket.firmwareVersion).isNewApi
-
+    
     // CONNECT, is the selected radio connected to another client?
     switch (isNewApi, Defaults[.isGui], status, guiCount) {
 
@@ -953,7 +954,7 @@ public final class ViewController             : NSViewController, RadioPickerDel
     let status = discoveryPacket.status.lowercased()
     let guiCount = discoveryPacket.guiClients.count
     let isNewApi = Version(discoveryPacket.firmwareVersion).isNewApi
-    
+
     // CONNECT, is the selected radio connected to another client?
     switch (isNewApi, Defaults[.isGui], status, guiCount) {
       
@@ -967,6 +968,8 @@ public final class ViewController             : NSViewController, RadioPickerDel
       alert.addButton(withTitle: "Disconnect \(discoveryPacket.guiClients[0].station)")
       alert.addButton(withTitle: "Disconnect xAPITester")
       alert.addButton(withTitle: "Cancel")
+      
+      alert.buttons[0].isEnabled = discoveryPacket.guiClients[0].station != "xAPITester"
       
       // ignore if not confirmed by the user
       alert.beginSheetModal(for: view.window!, completionHandler: { (response) in
@@ -988,6 +991,9 @@ public final class ViewController             : NSViewController, RadioPickerDel
       alert.addButton(withTitle: "Disconnect xAPITester")
       alert.addButton(withTitle: "Cancel")
       
+      alert.buttons[0].isEnabled = discoveryPacket.guiClients[0].station != "xAPITester"
+      alert.buttons[1].isEnabled = discoveryPacket.guiClients[1].station != "xAPITester"
+
       // ignore if not confirmed by the user
       alert.beginSheetModal(for: view.window!, completionHandler: { (response) in
         
@@ -1007,6 +1013,8 @@ public final class ViewController             : NSViewController, RadioPickerDel
         alert.addButton(withTitle: "Disconnect xAPITester")
         alert.addButton(withTitle: "Cancel")
         
+        alert.buttons[0].isEnabled = discoveryPacket.guiClients[0].station != "xAPITester"
+
         // ignore if not confirmed by the user
         alert.beginSheetModal(for: view.window!, completionHandler: { (response) in
           
@@ -1030,6 +1038,15 @@ public final class ViewController             : NSViewController, RadioPickerDel
     
     updateButtonStates(connected: false)
     title()
+    
+    // clear the previous Commands, Replies & Messages
+    if Defaults[.clearAtDisconnect] {
+      _splitViewVC?.messages.removeAll()
+      _splitViewVC?._tableView.reloadData()
+
+      _splitViewVC?.objects.removeAll()
+      _splitViewVC?._objectsTableView.reloadData()
+    }
   }
   /// Close the application
   ///

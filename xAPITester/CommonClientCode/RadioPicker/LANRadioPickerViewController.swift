@@ -281,13 +281,13 @@ final class LANRadioPickerViewController    : NSViewController, NSTableViewDeleg
     cellView.toolTip = Discovery.sharedInstance.discoveredRadios[row].description
 
     // is this the default row?
-    let isDefaultRow = Defaults[.defaultRadioSerialNumber]  == Discovery.sharedInstance.discoveredRadios[row].serialNumber
+    let isDefaultRow = (Defaults[.defaultRadioSerialNumber] == Discovery.sharedInstance.discoveredRadios[row].serialNumber)
     
     var stations = ""
     for client in Discovery.sharedInstance.discoveredRadios[row].guiClients {
       stations += (stations == "" ? client.station : ", " + client.station)
     }
-    
+
     // set the stringValue of the cell's text field to the appropriate field
     switch tableColumn!.identifier.rawValue {
       

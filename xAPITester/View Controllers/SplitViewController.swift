@@ -342,20 +342,21 @@ class SplitViewController: NSSplitViewController, ApiDelegate, NSTableViewDelega
           "  atu = \(Api.sharedInstance.radio!.atuPresent ? "Yes" : "No")  gps = \(Api.sharedInstance.radio!.gpsPresent ? "Yes" : "No")" +
           "  scu's = \(Api.sharedInstance.radio!.numberOfScus)"))
         
-        
-        
-        
-        // FIXME: Need a way to find the right DiscoveredRadio
-        
-        
-        
-        var index = 0
-        for (i, discoveryPacket) in Discovery.sharedInstance.discoveredRadios.enumerated() where discoveryPacket.serialNumber == radio.discoveryPacket.serialNumber {
-          index = i
-        }
-        
-        for client in Discovery.sharedInstance.discoveredRadios[index].guiClients {
-          
+//
+//
+//
+//        // FIXME: Need a way to find the right DiscoveredRadio
+//
+//
+//
+//        var index = 0
+//        for (i, discoveryPacket) in Discovery.sharedInstance.discoveredRadios.enumerated() where discoveryPacket.serialNumber == radio.discoveryPacket.serialNumber {
+//          index = i
+//        }
+//
+//        for client in Discovery.sharedInstance.discoveredRadios[index].guiClients {
+        for client in radio.discoveryPacket.guiClients {
+
           color = objectColors[i]
           
           if self._parent!._stationsPopUp.titleOfSelectedItem == "All" || self._parent!._stationsPopUp.titleOfSelectedItem == client.station {

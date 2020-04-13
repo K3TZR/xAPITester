@@ -22,6 +22,7 @@ extension DefaultsKeys {
   
   static var auth0Email               : DefaultsKey<String>   { return .init("auth0Email", defaultValue: "") }
   static var clearAtConnect           : DefaultsKey<Bool>     { return .init("clearAtConnect", defaultValue: false) }
+  static var clearAtDisconnect        : DefaultsKey<Bool>     { return .init("clearAtDisconnect", defaultValue: false) }
   static var clearOnSend              : DefaultsKey<Bool>     { return .init("clearOnSend", defaultValue: false) }
   static var clientId                 : DefaultsKey<String?>  { return .init("clientId") }
   static var defaultRadioSerialNumber : DefaultsKey<String>   { return .init("defaultRadioSerialNumber", defaultValue: "") }
@@ -114,6 +115,7 @@ extension URL {
 }
 
 extension NSButton {
+  
   /// Boolean equivalent of an NSButton state property
   ///
   var boolState : Bool {
