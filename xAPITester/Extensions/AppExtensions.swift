@@ -141,7 +141,12 @@ public extension String {
   }
 }
 
-extension String{
+extension String {
+  
+  /// Retrun a random collection of character as a String
+  /// - Parameter length:     the desired number of characters
+  /// - Returns:              a String of the requested length
+  ///
    static func random(length:Int)->String{
         let letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
         var randomString = ""
@@ -152,6 +157,20 @@ extension String{
         }
         return randomString
     }
+}
+
+extension String {
+  
+  /// Pad a string to a fixed length
+  /// - Parameters:
+  ///   - len:            the desired length
+  ///   - padCharacter:   the character to pad with
+  /// - Returns:          a padded string
+  ///
+  func padTo(_ len: Int, with padCharacter: String = " ") -> String {
+    
+    self.padding(toLength: len, withPad: padCharacter, startingAt: 0)
+  }
 }
 
 // ----------------------------------------------------------------------------

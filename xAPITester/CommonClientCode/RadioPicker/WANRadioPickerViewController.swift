@@ -46,13 +46,13 @@ final class WANRadioPickerViewController    : NSViewController, NSTableViewDeleg
   @IBOutlet private weak var _testButton    : NSButton!
   
   private var _api                          = Api.sharedInstance
-  private var _discoveredRadios             = [DiscoveryStruct]()           // Radios discovered
+  private var _discoveredRadios             = [DiscoveryPacket]()           // Radios discovered
   private let _log                          = Logger.sharedInstance
   private var _auth0ViewController          : Auth0ViewController?
   private weak var _delegate                : RadioPickerDelegate? {
     return representedObject as? RadioPickerDelegate
   }
-  private var _discoveryPacket              : DiscoveryStruct?
+  private var _discoveryPacket              : DiscoveryPacket?
   private var _wanServer                    : WanServer?
   private var _parentVc                     : NSViewController!
 
@@ -337,53 +337,10 @@ final class WANRadioPickerViewController    : NSViewController, NSTableViewDeleg
       
     } else {
       // DISCONNECT, RadioPicker remains open
-      delegate.closeRadio()
+      delegate.closeRadio(discoveryPacket)
     }
   }
 
-  /// Open or Close the selected Radio
-  ///
-  /// - Parameter lowBW: open the remote radio with low bandwith settings
-  ///
-//  private func openClose() {
-//    
-//    // Connect or Disconnect?
-//    if _selectButton.title == kConnectTitle {
-//      
-//      // CONNECT, RadioPicker sheet will close & Radio will be opened
-//      
-//      // is the selected radio in use, but not by this app?
-//      if _discoveryPacket!.status == "In_Use" && _api.radio == nil {
-//        
-//        // YES, ask the user to confirm closing it
-//        let alert = NSAlert()
-//        alert.alertStyle = .warning
-//        alert.messageText = "Disconnect Radio?"
-//        alert.informativeText = "Are you sure you want to disconnect the current radio session?"
-//        alert.addButton(withTitle: "Yes")
-//        alert.addButton(withTitle: "No")
-//        
-//        // ignore if not confirmed by the user
-//        alert.beginSheetModal(for: view.window!, completionHandler: { (response) in
-//          // close the connected Radio if the YES button pressed
-//          if response == NSApplication.ModalResponse.alertFirstButtonReturn { self.openRadio(lowBW: lowBW) }
-//        })
-//      } else {
-//      // NO, just open it
-//        openRadio(lowBW: lowBW)
-//      }
-//
-//    } else {
-//      
-//      // DISCONNECT, RadioPicker sheet will remain open & Radio will be disconnected
-//      
-//      // tell the delegate to disconnect
-//      _delegate?.closeRadio()
-//      
-//      // toggle the button title
-//      _selectButton.title = kConnectTitle
-//    }
-//  }
   /// Open a Radio & close the Picker
   ///
   private func openRadio() {
@@ -398,7 +355,7 @@ final class WANRadioPickerViewController    : NSViewController, NSTableViewDeleg
   ///
   /// - Parameter radio: Radio to connect to
   ///
-  private func getAuthentification(for discoveryPacket: DiscoveryStruct?) {
+  private func getAuthentification(for discoveryPacket: DiscoveryPacket?) {
     
     // FIXME: Is this correct
     
@@ -665,7 +622,7 @@ final class WANRadioPickerViewController    : NSViewController, NSTableViewDeleg
   
   /// Received radio list from server
   ///
-  func wanRadioListReceived(wanRadioList: [DiscoveryStruct]) {
+  func wanRadioListReceived(wanRadioList: [DiscoveryPacket]) {
     
     // relaod to display the updated list
     _discoveredRadios = wanRadioList

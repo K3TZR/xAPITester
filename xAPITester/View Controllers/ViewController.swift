@@ -24,13 +24,12 @@ protocol RadioPickerDelegate: class {
   ///   - radio:              a RadioParameters struct
   ///   - remote:             remote / local
   ///   - handle:             remote handle
-  /// - Returns:              success / failure
   ///
-  func openRadio(_ radio: DiscoveryStruct, isWan: Bool, wanHandle: String)
+  func openRadio(_ radio: DiscoveryPacket, isWan: Bool, wanHandle: String)
 
   /// Close the active Radio
   ///
-  func closeRadio()
+  func closeRadio(_ discoveryPacket: DiscoveryPacket)
 }
 
 // ------------------------------------------------------------------------------
@@ -44,7 +43,7 @@ public final class ViewController             : NSViewController, RadioPickerDel
   
   private var _api                            = Api.sharedInstance
   private let _log                            = Logger.sharedInstance
-  private var _radios                         : [DiscoveryStruct] { Discovery.sharedInstance.discoveredRadios }
+  private var _radios                         : [DiscoveryPacket] { Discovery.sharedInstance.discoveredRadios }
 
   @IBOutlet weak internal var _command          : NSTextField!
   @IBOutlet weak internal var _connectButton    : NSButton!
@@ -52,10 +51,9 @@ public final class ViewController             : NSViewController, RadioPickerDel
   @IBOutlet weak internal var _filterBy         : NSPopUpButton!
   @IBOutlet weak internal var _filterObjectsBy  : NSPopUpButton!
   @IBOutlet weak internal var _localRemote      : NSTextField!
-  @IBOutlet weak internal var _clientIds        : NSPopUpButton!
+  @IBOutlet weak internal var _stationsPopUp         : NSPopUpButton!
   @IBOutlet weak internal var _guiState         : NSTextField!
-  @IBOutlet weak internal var _bindToLabel      : NSTextField!
-  @IBOutlet weak internal var _bindToClientIds  : NSPopUpButton!
+  @IBOutlet weak internal var _bindingPopUp  : NSPopUpButton!
   @IBOutlet weak internal var _apiType          : NSTextField!
   
   // ----------------------------------------------------------------------------
@@ -107,6 +105,8 @@ public final class ViewController             : NSViewController, RadioPickerDel
   public override func viewDidLoad() {
     super.viewDidLoad()
     
+    let _ = Discovery.sharedInstance
+
     // give the Api access to our logger
     Log.sharedInstance.delegate = Logger.sharedInstance
     
@@ -134,13 +134,8 @@ public final class ViewController             : NSViewController, RadioPickerDel
     // set the window title
     title()
     
-//    // get / create the Application Support folder
-//    _appFolderUrl = FileManager.appFolder
-    
-    _clientIds.selectItem(withTitle: "All")
-    _bindToClientIds.selectItem(withTitle: "None")
-    
-    let _ = Discovery.sharedInstance
+    _stationsPopUp.selectItem(withTitle: "All")
+    _bindingPopUp.selectItem(withTitle: "None")
   }
   override public func viewWillAppear() {
     
@@ -199,9 +194,9 @@ public final class ViewController             : NSViewController, RadioPickerDel
       
       // open the Default Radio (if any), otherwise open the Picker
       // is the default Radio available?
-      if let defaultRadio = defaultRadioFound() {
+      if let defaultRadioDiscoveryPacket = defaultRadioFound() {
         // YES, open the default radio
-        openRadio(defaultRadio)
+        openRadio(defaultRadioDiscoveryPacket)
         
       } else {
         // NO, open the Radio Picker
@@ -210,10 +205,10 @@ public final class ViewController             : NSViewController, RadioPickerDel
 
     case kDisconnect:
       
-      updateButtonStates(connected: false)
-      
+      if let discoveryPacket = _api.radio?.discoveryPacket {
       // close the active Radio
-      closeRadio()
+        closeRadio(discoveryPacket)
+      }
       
     default:    // should never happen
       break
@@ -519,15 +514,31 @@ public final class ViewController             : NSViewController, RadioPickerDel
   ///
   /// - Parameter sender:     the popup
   ///
-  @IBAction func updateShowHandles(_ sender: NSPopUpButton) {
+  @IBAction func updateShowStations(_ sender: NSPopUpButton) {
     
+    if sender.titleOfSelectedItem == "All" {
+      _splitViewVC!.selectedStation = nil
+    } else {
+      _splitViewVC!.selectedStation = sender.titleOfSelectedItem
+    }
     // force a redraw
     _splitViewVC?.reloadTable()
   }
   @IBAction func updateBinding(_ sender: NSPopUpButton) {
+    
+    func findClientId(for station: String) -> String? {
+      for (_, radioPacket) in Discovery.sharedInstance.discoveredRadios.enumerated() {
+        for (_, guiClient) in radioPacket.guiClients.enumerated() {
+          if guiClient.station == station { return guiClient.clientId }
+        }
+      }
+      return nil
+    }
     // if a valid handle, bind to it
     if sender.titleOfSelectedItem != "None" {
-      _api.radio?.boundClientId = sender.titleOfSelectedItem!
+      if let clientId = findClientId(for: sender.titleOfSelectedItem!) {
+        _api.radio?.boundClientId = clientId
+      }
     }
   }
   /// The FilterBy PopUp changed (in the Commands & Replies box)
@@ -584,8 +595,8 @@ public final class ViewController             : NSViewController, RadioPickerDel
         self._connectButton.identifier = self.kDisconnect
         self._sendButton.isEnabled = true
 
-        self._clientIds.isEnabled = self._api.radio!.version.isNewApi && Defaults[.isGui]
-        self._bindToClientIds.isEnabled = self._api.radio!.version.isNewApi && !Defaults[.isGui]
+        self._stationsPopUp.isEnabled = self._api.radio!.version.isNewApi
+        self._bindingPopUp.isEnabled = self._api.radio!.version.isNewApi && !Defaults[.isGui]
 
       } else {
         self._localRemote.stringValue = ""
@@ -596,10 +607,10 @@ public final class ViewController             : NSViewController, RadioPickerDel
         self._connectButton.identifier = self.kConnect
         self._sendButton.isEnabled = false
 
-        self._clientIds.isEnabled = false
-        self._clientIds.selectItem(withTitle: "All")
-        self._bindToClientIds.isEnabled = false
-        self._bindToClientIds.selectItem(withTitle: "None")
+        self._stationsPopUp.isEnabled = false
+        self._stationsPopUp.selectItem(withTitle: "All")
+        self._bindingPopUp.isEnabled = false
+        self._bindingPopUp.selectItem(withTitle: "None")
       }
     }
   }
@@ -607,28 +618,22 @@ public final class ViewController             : NSViewController, RadioPickerDel
   ///
   /// - Returns:        a DiscoveryStruct struct or nil
   ///
-  private func defaultRadioFound() -> DiscoveryStruct? {
-    var defaultRadio: DiscoveryStruct?
+  private func defaultRadioFound() -> DiscoveryPacket? {
     
     // see if there is a valid default Radio
-    let defaultSerialNumber = Defaults[.defaultRadioSerialNumber]
-    if defaultSerialNumber != "" {
+    guard Defaults[.defaultRadioSerialNumber] != "" else { return nil }
+    
+    // allow time to hear the UDP broadcasts
+    usleep(2_000_000)
+    
+    // has the default Radio been found?
+    if let discoveryPacket = Discovery.sharedInstance.discoveredRadios.first(where: { $0.serialNumber == Defaults[.defaultRadioSerialNumber]} ) {
       
-      // allow time to hear the UDP broadcasts
-      usleep(2_000_000)
+      _log.logMessage("Default radio found, \(discoveryPacket.nickname) @ \(discoveryPacket.publicIp), serial \(discoveryPacket.serialNumber)", .info, #function, #file, #line)
       
-      // has the default Radio been found?
-      if let radio = _radios.first(where: { $0.serialNumber == defaultSerialNumber} ) {
-        
-        // YES, Save it in case something changed
-        Defaults[.defaultRadioSerialNumber] = defaultSerialNumber
-
-        _log.logMessage("Default radio found, \(radio.nickname) @ \(radio.publicIp), serial \(radio.serialNumber)", .info, #function, #file, #line)
-
-        defaultRadio = radio
-      }
+      return discoveryPacket
     }
-    return defaultRadio
+    return nil
   }
   /// Produce a Client Id (UUID)
   ///
@@ -669,51 +674,6 @@ public final class ViewController             : NSViewController, RadioPickerDel
     }
     return text
   }
-//  /// Determine if the Default radio (if any) is present
-//  ///
-//  fileprivate func checkForDefaultRadio() {
-//    var found = false
-//    
-//    // get the default Radio
-//    let defaultRadioParameters = DiscoveryStruct( Defaults[.defaultRadio] )
-//    
-//    // is it valid?
-//    if defaultRadioParameters.publicIp != "" && defaultRadioParameters.port != 0 {
-//      
-//      // YES, allow time to hear the UDP broadcasts
-//      sleep(kDelayForAvailableRadios)
-//      
-//      // has the default Radio been found?
-//      for (_, foundRadioParameters) in _api.discoveredRadios.enumerated() where foundRadioParameters == defaultRadioParameters {
-//        
-//        // YES, Save it in case something changed
-//        found = true
-//        Defaults[.defaultRadio] = foundRadioParameters.dict
-//        
-//        // log it
-//        _log("Default radio found: \(foundRadioParameters.nickname) @ \(foundRadioParameters.publicIp)", .info, #function, #file, #line)
-//      }
-//      if found {
-//        
-//        // can the default radio be opened?
-//        if !openRadio(defaultRadioParameters) {
-//          _splitViewVC?.msg("Error opening default radio, \(defaultRadioParameters.nickname)")
-//          
-//          // NO, open the Radio Picker
-//          openRadioPicker( self)
-//        }
-//        
-//      } else {
-//        
-//        // NOT FOUND, open the Radio Picker
-//        openRadioPicker( self)
-//      }
-//    
-//    } else {
-//      // NOT VALID, open the Radio Picker
-//      openRadioPicker(self)
-//    }
-//  }
   /// Set the Window's title
   ///
   private func title() {
@@ -743,6 +703,8 @@ public final class ViewController             : NSViewController, RadioPickerDel
     
     NC.makeObserver(self, with: #selector(radioDowngrade(_:)), of: .radioDowngrade)
     NC.makeObserver(self, with: #selector(clientDidDisconnect(_:)), of: .clientDidDisconnect)
+    NC.makeObserver(self, with: #selector(guiClientHasBeenAdded(_:)), of: .guiClientHasBeenAdded)
+    NC.makeObserver(self, with: #selector(guiClientHasBeenRemoved(_:)), of: .guiClientHasBeenRemoved)
   }
   /// Process .radioDowngrade Notification
   ///
@@ -784,6 +746,40 @@ public final class ViewController             : NSViewController, RadioPickerDel
       if self._connectButton.identifier == self.kDisconnect { self._connectButton.performClick(self) }
     }
   }
+  /// Process .guiclientHasBeenAdded Notification
+  ///
+  /// - Parameter note:         a Notification instance
+  ///
+  @objc private func guiClientHasBeenAdded(_ note: Notification) {
+    
+    if let station = note.object as? String {
+      DispatchQueue.main.async { [unowned self] in
+        
+        if station.trimmingCharacters(in: .whitespaces) != "" {
+                    
+          self._stationsPopUp.addItem(withTitle: station)
+          self._bindingPopUp.addItem(withTitle: station)
+        }
+      }
+    }
+  }
+  /// Process .guiclientHasBeenRemoved Notification
+  ///
+  /// - Parameter note:         a Notification instance
+  ///
+  @objc private func guiClientHasBeenRemoved(_ note: Notification) {
+
+    if let station = note.object as? String {
+      DispatchQueue.main.async { [unowned self] in
+        
+        if station.trimmingCharacters(in: .whitespaces) != "" {
+                    
+          self._stationsPopUp.removeItem(withTitle: station)
+          self._bindingPopUp.removeItem(withTitle: station)
+        }
+      }
+    }
+  }
 
   // ----------------------------------------------------------------------------
   // MARK: - RadioPickerDelegate methods
@@ -798,7 +794,7 @@ public final class ViewController             : NSViewController, RadioPickerDel
   ///   - wanHandle:            Wan handle (if any)
   /// - Returns:                success / failure
   ///
-  func connectRadio(_ discoveredRadio: DiscoveryStruct?, isWan: Bool = false, wanHandle: String = "", pendingDisconnect: Handle? = nil) {
+  func connectRadio(_ discoveredRadio: DiscoveryPacket?, isWan: Bool = false, wanHandle: String = "", pendingDisconnect: Handle? = nil) {
     
     if let _ = _radioPickerTabViewController {
       self._radioPickerTabViewController = nil
@@ -813,23 +809,37 @@ public final class ViewController             : NSViewController, RadioPickerDel
     // clear the objects
     _splitViewVC?.objects.removeAll()
     _splitViewVC?._objectsTableView.reloadData()
-    
-    
+        
     // if not a GUI connection, allow the Tester to see all stream objects
     _api.testerModeEnabled = !Defaults[.isGui]
     
-    // attempt to connect to it
-    let station = (Host.current().localizedName ?? "Mac").replacingSpaces(with: "_")
+    // Is there a client that must be disconnected first?
+    if let handle = pendingDisconnect {
+      // YES, connect to the radio as a non-GUI
+      if _api.connect(selectedRadio,
+                      clientStation: "",
+                      programName: Logger.kAppName,
+                      clientId: nil,
+                      isGui: false,
+                      isWan: isWan,
+                      wanHandle: wanHandle) {
+        
+        // send a disconnect message
+        _api.sendDisconnect(handle)
+        sleep(1)
+        _api.disconnect()
+        sleep(1)
+      }
+    }
+    // connect to the radio
     if _api.connect(selectedRadio,
-                    clientStation: station,
+                    clientStation: Logger.kAppName,
                     programName: Logger.kAppName,
                     clientId: Defaults[.isGui] ? _clientId : nil,
                     isGui: Defaults[.isGui],
                     isWan: isWan,
-                    wanHandle: wanHandle,
-                    pendingDisconnect: pendingDisconnect) {
-      
-      
+                    wanHandle: wanHandle) {
+            
       _startTimestamp = Date()
       
       updateButtonStates(connected: true, isWan)
@@ -849,7 +859,7 @@ public final class ViewController             : NSViewController, RadioPickerDel
     }
   }
 
-  func openRadio(_ discoveryPacket: DiscoveryStruct, isWan: Bool = false, wanHandle: String = "") {
+  func openRadio(_ discoveryPacket: DiscoveryPacket, isWan: Bool = false, wanHandle: String = "") {
     
     let status = discoveryPacket.status.lowercased()
     let guiCount = discoveryPacket.guiClients.count
@@ -936,17 +946,88 @@ public final class ViewController             : NSViewController, RadioPickerDel
       break
     }
   }
-  /// Close the currently active Radio
+  /// Close  a currently active connection
   ///
-  func closeRadio() {
+  func closeRadio(_ discoveryPacket: DiscoveryPacket) {
     
+    let status = discoveryPacket.status.lowercased()
+    let guiCount = discoveryPacket.guiClients.count
+    let isNewApi = Version(discoveryPacket.firmwareVersion).isNewApi
+    
+    // CONNECT, is the selected radio connected to another client?
+    switch (isNewApi, Defaults[.isGui], status, guiCount) {
+      
+    case (false, _, _, _):                // oldApi, Non-Gui or Gui
+      self.disconnectApiTester()
+      
+    case (true, true, "available", 1):    // newApi, Gui, connected to another client, should the client be closed?
+      let alert = NSAlert()
+      alert.alertStyle = .warning
+      alert.messageText = "Radio is connected to Station: \(discoveryPacket.guiClients[0].station)"
+      alert.addButton(withTitle: "Disconnect \(discoveryPacket.guiClients[0].station)")
+      alert.addButton(withTitle: "Disconnect xAPITester")
+      alert.addButton(withTitle: "Cancel")
+      
+      // ignore if not confirmed by the user
+      alert.beginSheetModal(for: view.window!, completionHandler: { (response) in
+        // close the connected Radio if the YES button pressed
+        
+        switch response {
+        case NSApplication.ModalResponse.alertFirstButtonReturn:  self._api.sendDisconnect( discoveryPacket.guiClients[0].handle)
+        case NSApplication.ModalResponse.alertSecondButtonReturn: self.disconnectApiTester()
+        default:  break
+        }
+      })
+      
+    case (true, _, "in_use", 2):       // newApi, Non-Gui or Gui, 2 clients, should one of the clients be closed?
+      let alert = NSAlert()
+      alert.alertStyle = .warning
+      alert.messageText = "Radio is connected to multiple Stations"
+      alert.addButton(withTitle: "Disconnect \(discoveryPacket.guiClients[0].station)")
+      alert.addButton(withTitle: "Disconnect \(discoveryPacket.guiClients[1].station)")
+      alert.addButton(withTitle: "Disconnect xAPITester")
+      alert.addButton(withTitle: "Cancel")
+      
+      // ignore if not confirmed by the user
+      alert.beginSheetModal(for: view.window!, completionHandler: { (response) in
+        
+        switch response {
+        case NSApplication.ModalResponse.alertFirstButtonReturn:  self._api.sendDisconnect( discoveryPacket.guiClients[0].handle)
+        case NSApplication.ModalResponse.alertSecondButtonReturn: self._api.sendDisconnect( discoveryPacket.guiClients[1].handle)
+        case NSApplication.ModalResponse.alertThirdButtonReturn:  self.disconnectApiTester()
+        default:  break
+        }
+      })
+
+      case (true, _, "available", 1):       // newApi, Non-Gui or Gui, 1 clients, should the client be closed?
+        let alert = NSAlert()
+        alert.alertStyle = .warning
+        alert.messageText = "Radio is connected to multiple Stations"
+        alert.addButton(withTitle: "Disconnect \(discoveryPacket.guiClients[0].station)")
+        alert.addButton(withTitle: "Disconnect xAPITester")
+        alert.addButton(withTitle: "Cancel")
+        
+        // ignore if not confirmed by the user
+        alert.beginSheetModal(for: view.window!, completionHandler: { (response) in
+          
+          switch response {
+          case NSApplication.ModalResponse.alertFirstButtonReturn:  self._api.sendDisconnect( discoveryPacket.guiClients[0].handle)
+          case NSApplication.ModalResponse.alertSecondButtonReturn:  self.disconnectApiTester()
+          default:  break
+          }
+        })
+
+    default:
+        self.disconnectApiTester()
+    }
+  }
+  
+  /// Close this app
+  ///
+  private func disconnectApiTester() {
     // disconnect the active radio
     _api.disconnect()
     
-//    _sendButton.isEnabled = false
-//    _connectButton.title = kConnect.rawValue
-//    _connectButton.identifier = kConnect
-//    _localRemote.stringValue = ""
     updateButtonStates(connected: false)
     title()
   }

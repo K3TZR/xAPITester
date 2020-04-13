@@ -64,6 +64,7 @@
 		9187259B23D63ED9009B63A3 /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		9187259C23D63ED9009B63A3 /* HelpViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HelpViewController.swift; sourceTree = "<group>"; };
 		9187259D23D63ED9009B63A3 /* SplitViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SplitViewController.swift; sourceTree = "<group>"; };
+		9194963024365BA100306868 /* xLib6000 */ = {isa = PBXFileReference; lastKnownFileType = folder; name = xLib6000; path = ../xLib6000; sourceTree = "<group>"; };
 		9196148623D1372D0069AE94 /* xAPITester.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = xAPITester.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		919F57DD24193D40001956B0 /* Logger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		91B1D25124205B9C00A7B5E4 /* Package.resolved */ = {isa = PBXFileReference; lastKnownFileType = text; path = Package.resolved; sourceTree = SOURCE_ROOT; };
@@ -200,6 +201,7 @@
 		9196147D23D1372D0069AE94 = {
 			isa = PBXGroup;
 			children = (
+				9194963024365BA100306868 /* xLib6000 */,
 				9187259423D63CD1009B63A3 /* README.md */,
 				9187255523D63C8A009B63A3 /* xAPITester */,
 				9196148723D1372D0069AE94 /* Products */,

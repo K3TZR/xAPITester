@@ -29,7 +29,7 @@ protocol LANRadioPickerDelegate: class {
   ///   - handle:         remote handle
   /// - Returns:          success / failure
   ///
-  func openRadio(_ radio: DiscoveryStruct?, remote: Bool, handle: String ) -> Bool
+  func openRadio(_ radio: DiscoveryPacket?, remote: Bool, handle: String ) -> Bool
   
   /// Close the active Radio
   ///
@@ -61,8 +61,8 @@ final class LANRadioPickerViewController    : NSViewController, NSTableViewDeleg
   @IBOutlet private var _defaultButton      : NSButton!                   // Set as default
   
   private var _api                          = Api.sharedInstance
-  private var _discoveryPacket              : DiscoveryStruct?
-  private var _discoveryPackets             : [DiscoveryStruct] { Discovery.sharedInstance.discoveredRadios }
+  private var _discoveryPacket              : DiscoveryPacket?
+//  private var _discoveryPackets             : [DiscoveryPacket] { Discovery.sharedInstance.discoveredRadios }
   private let _log                          = Logger.sharedInstance
 
   private weak var _parentVc                : NSViewController!
@@ -140,7 +140,7 @@ final class LANRadioPickerViewController    : NSViewController, NSTableViewDeleg
       
     } else {
       
-      Defaults[.defaultRadioSerialNumber] = _discoveryPackets[selectedRow].serialNumber
+      Defaults[.defaultRadioSerialNumber] = Discovery.sharedInstance.discoveredRadios[selectedRow].serialNumber
     }
     
     // to display the Default status
@@ -188,7 +188,7 @@ final class LANRadioPickerViewController    : NSViewController, NSTableViewDeleg
 
     // Connect / Disconnect
     if _selectButton.title == kConnectTitle {
-      
+
       // CONNECT, tell the delegate to connect to the selected Radio
       _delegate?.openRadio(discoveryPacket, isWan: false, wanHandle: "")
       
@@ -199,7 +199,7 @@ final class LANRadioPickerViewController    : NSViewController, NSTableViewDeleg
       
     } else {
       // DISCONNECT, RadioPicker remains open
-      delegate.closeRadio()
+      delegate.closeRadio(discoveryPacket)
     }
   }
 
@@ -211,13 +211,37 @@ final class LANRadioPickerViewController    : NSViewController, NSTableViewDeleg
   private func addNotifications() {
     
     // Available Radios changed
-    NC.makeObserver(self, with: #selector(Discovered(_:)), of: .discoveredRadios)
+    NC.makeObserver(self, with: #selector(discoveredRadios), of: .discoveredRadios)
+    NC.makeObserver(self, with: #selector(guiClientHasBeenAdded), of: .guiClientHasBeenAdded)
+    NC.makeObserver(self, with: #selector(guiClientHasBeenRemoved), of: .guiClientHasBeenRemoved)
   }
   /// Process .DiscoveryStructs Notification
   ///
   /// - Parameter note: a Notification instance
   ///
-  @objc private func Discovered(_ note: Notification) {
+  @objc private func discoveredRadios(_ note: Notification) {
+    
+    DispatchQueue.main.async { [weak self] in
+      
+      self?._radioTableView.reloadData()
+    }
+  }
+  /// Process .guiClientHasBeenAdded Notification
+  ///
+  /// - Parameter note: a Notification instance
+  ///
+  @objc private func guiClientHasBeenAdded(_ note: Notification) {
+    
+    DispatchQueue.main.async { [weak self] in
+      
+      self?._radioTableView.reloadData()
+    }
+  }
+  /// Process .guiClientHasBeenRemoved Notification
+  ///
+  /// - Parameter note: a Notification instance
+  ///
+  @objc private func guiClientHasBeenRemoved(_ note: Notification) {
     
     DispatchQueue.main.async { [weak self] in
       
@@ -236,7 +260,7 @@ final class LANRadioPickerViewController    : NSViewController, NSTableViewDeleg
   func numberOfRows(in aTableView: NSTableView) -> Int {
 
     // get the number of rows
-    return _discoveryPackets.count
+    return Discovery.sharedInstance.discoveredRadios.count
   }
   
   // ----------------------------------------------------------------------------
@@ -251,21 +275,27 @@ final class LANRadioPickerViewController    : NSViewController, NSTableViewDeleg
   /// - Returns: an NSView
   ///
   func tableView( _ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
-    
+        
     // get a view for the cell
     let cellView = tableView.makeView(withIdentifier: tableColumn!.identifier, owner:self) as! NSTableCellView
-    cellView.toolTip = _discoveryPackets[row].description
+    cellView.toolTip = Discovery.sharedInstance.discoveredRadios[row].description
 
     // is this the default row?
-    let isDefaultRow = Defaults[.defaultRadioSerialNumber]  == _discoveryPackets[row].serialNumber
+    let isDefaultRow = Defaults[.defaultRadioSerialNumber]  == Discovery.sharedInstance.discoveredRadios[row].serialNumber
+    
+    var stations = ""
+    for client in Discovery.sharedInstance.discoveredRadios[row].guiClients {
+      stations += (stations == "" ? client.station : ", " + client.station)
+    }
     
     // set the stringValue of the cell's text field to the appropriate field
     switch tableColumn!.identifier.rawValue {
       
-    case "model":     cellView.textField!.stringValue = _discoveryPackets[row].model
-    case "nickname":  cellView.textField!.stringValue = _discoveryPackets[row].nickname
-    case "status":    cellView.textField!.stringValue = _discoveryPackets[row].status
-    case "publicIp":  cellView.textField!.stringValue = _discoveryPackets[row].publicIp
+    case "model":     cellView.textField!.stringValue = Discovery.sharedInstance.discoveredRadios[row].model
+    case "nickname":  cellView.textField!.stringValue = Discovery.sharedInstance.discoveredRadios[row].nickname
+    case "status":    cellView.textField!.stringValue = Discovery.sharedInstance.discoveredRadios[row].status
+    case "stations":  cellView.textField!.stringValue = stations
+    case "publicIp":  cellView.textField!.stringValue = Discovery.sharedInstance.discoveredRadios[row].publicIp
     default:          _log.logMessage("Unknown table column: \(tableColumn!.identifier.rawValue)", .error, #function, #file, #line)
     }
 
@@ -290,15 +320,15 @@ final class LANRadioPickerViewController    : NSViewController, NSTableViewDeleg
     
     if _radioTableView.selectedRow >= 0 {
       // a row is selected
-      _discoveryPacket = _discoveryPackets[_radioTableView.selectedRow]
-      
+      _discoveryPacket = Discovery.sharedInstance.discoveredRadios[_radioTableView.selectedRow]
+
       // set the "select button" title appropriately
       var isActive = false
       if let radio = Api.sharedInstance.radio {
-        isActive = ( radio.discoveryPacket == _discoveryPackets[_radioTableView.selectedRow] )
+        isActive = ( radio.discoveryPacket == Discovery.sharedInstance.discoveredRadios[_radioTableView.selectedRow] )
       }
       // set "default button" title appropriately
-      _defaultButton.title = (Defaults[.defaultRadioSerialNumber] == _discoveryPackets[_radioTableView.selectedRow].serialNumber ? kClearDefault : kSetAsDefault)
+      _defaultButton.title = (Defaults[.defaultRadioSerialNumber] == Discovery.sharedInstance.discoveredRadios[_radioTableView.selectedRow].serialNumber ? kClearDefault : kSetAsDefault)
       _selectButton.title = (isActive ? kDisconnectTitle : kConnectTitle)
       
     } else {
