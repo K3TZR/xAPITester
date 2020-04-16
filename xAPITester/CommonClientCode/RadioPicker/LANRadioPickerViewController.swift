@@ -275,7 +275,9 @@ final class LANRadioPickerViewController    : NSViewController, NSTableViewDeleg
   /// - Returns: an NSView
   ///
   func tableView( _ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
-        
+
+    let version = Version(Discovery.sharedInstance.discoveredRadios[row].firmwareVersion)
+
     // get a view for the cell
     let cellView = tableView.makeView(withIdentifier: tableColumn!.identifier, owner:self) as! NSTableCellView
     cellView.toolTip = Discovery.sharedInstance.discoveredRadios[row].description
@@ -294,7 +296,7 @@ final class LANRadioPickerViewController    : NSViewController, NSTableViewDeleg
     case "model":     cellView.textField!.stringValue = Discovery.sharedInstance.discoveredRadios[row].model
     case "nickname":  cellView.textField!.stringValue = Discovery.sharedInstance.discoveredRadios[row].nickname
     case "status":    cellView.textField!.stringValue = Discovery.sharedInstance.discoveredRadios[row].status
-    case "stations":  cellView.textField!.stringValue = stations
+    case "stations":  cellView.textField!.stringValue = (version.isNewApi ? stations : "n/a")
     case "publicIp":  cellView.textField!.stringValue = Discovery.sharedInstance.discoveredRadios[row].publicIp
     default:          _log.logMessage("Unknown table column: \(tableColumn!.identifier.rawValue)", .error, #function, #file, #line)
     }

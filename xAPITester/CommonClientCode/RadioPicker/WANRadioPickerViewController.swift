@@ -270,53 +270,7 @@ final class WANRadioPickerViewController    : NSViewController, NSTableViewDeleg
   
   // ----------------------------------------------------------------------------
   // MARK: - Private methods
-  
-//  private func connectDisconnect() {
-//
-//    guard let discoveryPacket = _discoveryPacket else { return }
-//
-//    _discoveryPacket!.lowBandwidthConnect = Defaults[.lowBandwidthEnabled]
-//
-//    // Connect / Disconnect
-//    if _selectButton.title == kConnectTitle {
-//
-//      // CONNECT, is the selected radio connected to another client?
-//      switch (discoveryPacket.status, discoveryPacket.guiClients.count) {
-//
-//      case ("Available", 0):    // not connected to another client
-//        openRadio()
-//
-//      case ("Available", _):    // connected to another client, should the client be closed?
-//        let alert = NSAlert()
-//        alert.alertStyle = .warning
-//        alert.messageText = "Radio is connected to Station: \(discoveryPacket.guiClients[0].station)"
-//        //        alert.informativeText = "Station: \(discoveryPacket.guiClients[0].station)?"
-//        alert.addButton(withTitle: "Disconnect \(discoveryPacket.guiClients[0].station)")
-//        alert.addButton(withTitle: "Connect using Multiflex")
-//        alert.addButton(withTitle: "Cancel")
-//
-//        // ignore if not confirmed by the user
-//        alert.beginSheetModal(for: view.window!, completionHandler: { (response) in
-//          // close the connected Radio if the YES button pressed
-//
-//          switch response {
-//          //            case NSApplication.ModalResponse.alertFirstButtonReturn:  self.openRadio(discoveryPacket, pendingDisconnect: discoveryPacket.guiClients[0].handle)
-//          case NSApplication.ModalResponse.alertFirstButtonReturn:  break
-//          case NSApplication.ModalResponse.alertSecondButtonReturn: self.openRadio()
-//          default:  return
-//          }
-//        })
-//
-//      default:
-//        Swift.print("????")
-//      }
-//
-//    } else {  // DISCONNECT, RadioPicker remains open
-//      _delegate?.closeRadio()
-//      _selectButton.title = kConnectTitle
-//    }
-//  }
-  
+    
   /// Connect / Disconnect a Radio
   ///
   private func connectDisconnect() {
@@ -805,6 +759,8 @@ final class WANRadioPickerViewController    : NSViewController, NSTableViewDeleg
   ///
   func tableView( _ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
     
+    let version = Version(_discoveredRadios[row].firmwareVersion)
+
     // get a view for the cell
     let cellView = tableView.makeView(withIdentifier: tableColumn!.identifier, owner:self) as! NSTableCellView
     
@@ -813,6 +769,7 @@ final class WANRadioPickerViewController    : NSViewController, NSTableViewDeleg
     case "model":     cellView.textField!.stringValue = _discoveredRadios[row].model
     case "nickname":  cellView.textField!.stringValue = _discoveredRadios[row].nickname
     case "status":    cellView.textField!.stringValue = _discoveredRadios[row].status
+    case "stations":  cellView.textField!.stringValue = (version.isNewApi ? _discoveredRadios[row].guiClientStations : "n/a")
     case "publicIp":  cellView.textField!.stringValue = _discoveredRadios[row].publicIp
     default:          break
     }

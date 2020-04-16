@@ -329,7 +329,7 @@ class SplitViewController: NSSplitViewController, ApiDelegate, NSTableViewDelega
     ]
 
     DispatchQueue.main.async { [unowned self] in
-      var activeHandle : Handle? = nil
+      var activeHandle : Handle = 0
       
       // Radio
       if let radio = Api.sharedInstance.radio {
@@ -341,111 +341,30 @@ class SplitViewController: NSSplitViewController, ApiDelegate, NSTableViewDelega
         self.addObjectsToTable((color, "Radio          name = \(radio.nickname)  model = \(radio.discoveryPacket.model)  ip = \(radio.discoveryPacket.publicIp)" +
           "  atu = \(Api.sharedInstance.radio!.atuPresent ? "Yes" : "No")  gps = \(Api.sharedInstance.radio!.gpsPresent ? "Yes" : "No")" +
           "  scu's = \(Api.sharedInstance.radio!.numberOfScus)"))
-        
-//
-//
-//
-//        // FIXME: Need a way to find the right DiscoveredRadio
-//
-//
-//
-//        var index = 0
-//        for (i, discoveryPacket) in Discovery.sharedInstance.discoveredRadios.enumerated() where discoveryPacket.serialNumber == radio.discoveryPacket.serialNumber {
-//          index = i
-//        }
-//
-//        for client in Discovery.sharedInstance.discoveredRadios[index].guiClients {
-        for client in radio.discoveryPacket.guiClients {
 
-          color = objectColors[i]
-          
-          if self._parent!._stationsPopUp.titleOfSelectedItem == "All" || self._parent!._stationsPopUp.titleOfSelectedItem == client.station {
-            activeHandle = client.handle
+        // what verion is the Radio?
+        if radio.version.isNewApi {
+          // newApi
+          for client in radio.discoveryPacket.guiClients {
             
-            self.addObjectsToTable((color, "Gui Client     station = \(client.station.padTo(15))  handle = \(client.handle.hex)  id = \(client.clientId ?? "unknown")  localPtt = \(client.isLocalPtt ? "Yes" : "No ")  available = \(radio.discoveryPacket.status.lowercased() == "available" ? "Yes" : "No ")  program = \(client.program)"))
+            color = objectColors[i]
             
-            // MicAudioStream
-            for (_, stream) in radio.micAudioStreams where stream.clientHandle == activeHandle {
-              self.addObjectsToTable((color, "MicAudio       id = \(stream.id.hex)  handle = \(stream.clientHandle.hex)  ip = \(stream.ip)  port = \(stream.port)"))
-            }
-            // IqStream without a Panadapter
-            for (_, stream) in radio.iqStreams where stream.clientHandle == activeHandle && stream.pan == 0 {
-              self.addObjectsToTable((color, "Iq             id = \(stream.id.hex)  channel = \(stream.daxIqChannel)  rate = \(stream.rate)  ip = \(stream.ip)  panadapter = -not assigned-"))
-            }
-            // TxAudioStream
-            for (_, stream) in radio.txAudioStreams where stream.clientHandle == activeHandle {
-              self.addObjectsToTable((color, "TxAudio        id = \(stream.id.hex)  handle = \(stream.clientHandle.hex)  transmit = \(stream.transmit)  ip = \(stream.ip)  port = \(stream.port)"))
-            }
-            // DaxRxAudioStream without a Slice
-            for (_, stream) in radio.daxRxAudioStreams where stream.clientHandle == activeHandle && stream.slice == nil {
-              self.addObjectsToTable((color, "DaxRxAudio     id = \(stream.id.hex)  handle = \(stream.clientHandle.hex)  channel = \(stream.daxChannel)  ip = \(stream.ip)  slice = -not assigned-"))
-            }
-            // DaxTxAudioStream
-            for (_, stream) in radio.daxTxAudioStreams where stream.clientHandle == activeHandle {
-              self.addObjectsToTable((color, "DaxTxAudio     id = \(stream.id.hex)  handle = \(stream.clientHandle.hex)  isTransmit = \(stream.isTransmitChannel)"))
-            }
-            // DaxIqStream without a Panadapter
-            for (_, stream) in radio.daxIqStreams where stream.clientHandle == activeHandle && stream.pan == 0 {
-              self.addObjectsToTable((color, "DaxIq          id = \(stream.id.hex)  handle = \(stream.clientHandle.hex)  channel = \(stream.channel)  rate = \(stream.rate)  ip = \(stream.ip)  panadapter = -not assigned-"))
-            }
-            // RemoteRxAudioStream
-            for (_, stream) in radio.remoteRxAudioStreams where stream.clientHandle == activeHandle {
-              self.addObjectsToTable((color, "RemoteRxAudio  id = \(stream.id.hex)  handle = \(stream.clientHandle.hex)  compression = \(stream.compression)"))
-            }
-            // RemoteTxAudioStream
-            for (_, stream) in radio.remoteTxAudioStreams where stream.clientHandle == activeHandle {
-              self.addObjectsToTable((color, "RemoteTxAudio  id = \(stream.id.hex)  handle = \(stream.clientHandle.hex)  compression = \(stream.compression)  ip = \(stream.ip)"))
-            }
-            // DaxMicAudioStream
-            for (_, stream) in radio.daxMicAudioStreams where stream.clientHandle == activeHandle {
-              self.addObjectsToTable((color, "DaxMicAudio    id = \(stream.id.hex)  handle = \(stream.clientHandle.hex)  ip = \(stream.ip)"))
-            }
-            
-            // Panadapters & its accompanying objects
-            for (_, panadapter) in radio.panadapters {
-              if activeHandle != nil && panadapter.clientHandle != activeHandle { continue }
+            if self._parent!._stationsPopUp.titleOfSelectedItem == "All" || self._parent!._stationsPopUp.titleOfSelectedItem == client.station {
+              activeHandle = client.handle
               
-              self.addObjectsToTable((color, "Panadapter     client = \(panadapter.clientHandle.hex)  id = \(panadapter.id.hex)  center = \(panadapter.center.hzToMhz)  bandwidth = \(panadapter.bandwidth.hzToMhz)"))
+              self.addObjectsToTable((color, "Gui Client     station = \(client.station.padTo(15))  handle = \(client.handle.hex)  id = \(client.clientId ?? "unknown")  localPtt = \(client.isLocalPtt ? "Yes" : "No ")  available = \(radio.discoveryPacket.status.lowercased() == "available" ? "Yes" : "No ")  program = \(client.program)"))
               
-              // Waterfall
-              for (_, waterfall) in radio.waterfalls where panadapter.id == waterfall.panadapterId {
-                self.addObjectsToTable((color, "      Waterfall   id = \(waterfall.id.hex)  autoBlackEnabled = \(waterfall.autoBlackEnabled),  colorGain = \(waterfall.colorGain),  blackLevel = \(waterfall.blackLevel),  duration = \(waterfall.lineDuration)"))
-              }
-              
-              // IqStream
-              for (_, iqStream) in radio.iqStreams where panadapter.id == iqStream.pan {
-                self.addObjectsToTable((color, "      Iq          id = \(iqStream.id.hex)"))
-              }
-              
-              // DaxIqStream
-              for (_, daxIqStream) in radio.daxIqStreams where panadapter.id == daxIqStream.pan {
-                self.addObjectsToTable((color, "      DaxIq       id = \(daxIqStream.id.hex)"))
-              }
-              
-              // Slice(s) & their accompanying objects
-              for (_, slice) in radio.slices where panadapter.id == slice.panadapterId {
-                self.addObjectsToTable((color, "      Slice       id = \(slice.id)  frequency = \(slice.frequency.hzToMhz)  filterLow = \(slice.filterLow)  filterHigh = \(slice.filterHigh)  active = \(slice.active)  locked = \(slice.locked)"))
-                
-                // AudioStream
-                for (_, stream) in radio.audioStreams where stream.slice?.id == slice.id {
-                  self.addObjectsToTable((color, "          Audio       id = \(stream.id.hex)  ip = \(stream.ip)  port = \(stream.port)"))
-                }
-                
-                // DaxRxAudioStream
-                for (_, stream) in radio.daxRxAudioStreams where stream.slice?.id == slice.id {
-                  self.addObjectsToTable((color, "          DaxAudio    id = \(stream.id.hex)  channel = \(stream.daxChannel)  ip = \(stream.ip)"))
-                }
-                
-                // Meters
-                for (_, meter) in radio.meters.sorted(by: { $0.value.id < $1.value.id }) {
-                  if meter.source == "slc" && meter.group == String(slice.id) {
-                    self.addObjectsToTable((color, "          Meter id = \(meter.id)  name = \(meter.name.padTo(12))  units = \(meter.units.padTo(5))  low = \(String(format: "% 7.2f", meter.low))  high = \(String(format: "% 7.2f", meter.high))  fps = \(String(format: "% 3d", meter.fps))  desc = \(meter.desc)  "))
-                  }
-                }
-              }
+              self.addSelectedObjects(activeHandle, radio, color)
             }
+            i = (i + 1) % objectColors.count
           }
-          i = (i + 1) % objectColors.count
+        } else {
+          // oldApi
+            color = objectColors[i]
+            
+            self.addSelectedObjects(activeHandle, radio, color)
+            
+            i = (i + 1) % objectColors.count
         }
         self.reloadObjectsTable()
         color = NSColor.systemGray.withAlphaComponent(0.2)
@@ -489,6 +408,96 @@ class SplitViewController: NSSplitViewController, ApiDelegate, NSTableViewDelega
           self.addObjectsToTable((color, "Meter          source = \(meter.source[0..<3])  group = \(("00" + meter.group).suffix(3))  id = \(String(format: "%03d", meter.id))  name = \(meter.name.padTo(12))  units = \(meter.units.padTo(5))  low = \(String(format: "% 7.2f", meter.low))  high = \(String(format: "% 7.2f", meter.high))  fps = \(String(format: "% 3d", meter.fps))  desc = \(meter.desc)  "))
         }
         self.reloadObjectsTable()
+      }
+    }
+  }
+  
+  
+  
+  
+  private func addSelectedObjects(_ activeHandle: Handle, _ radio: Radio, _ color: NSColor) {
+
+    // MicAudioStream
+    for (_, stream) in radio.micAudioStreams where stream.clientHandle == activeHandle {
+      self.addObjectsToTable((color, "MicAudio       id = \(stream.id.hex)  handle = \(stream.clientHandle.hex)  ip = \(stream.ip)  port = \(stream.port)"))
+    }
+    // IqStream without a Panadapter
+    for (_, stream) in radio.iqStreams where stream.clientHandle == activeHandle && stream.pan == 0 {
+      self.addObjectsToTable((color, "Iq             id = \(stream.id.hex)  channel = \(stream.daxIqChannel)  rate = \(stream.rate)  ip = \(stream.ip)  panadapter = -not assigned-"))
+    }
+    // TxAudioStream
+    for (_, stream) in radio.txAudioStreams where stream.clientHandle == activeHandle {
+      self.addObjectsToTable((color, "TxAudio        id = \(stream.id.hex)  handle = \(stream.clientHandle.hex)  transmit = \(stream.transmit)  ip = \(stream.ip)  port = \(stream.port)"))
+    }
+    // DaxRxAudioStream without a Slice
+    for (_, stream) in radio.daxRxAudioStreams where stream.clientHandle == activeHandle && stream.slice == nil {
+      self.addObjectsToTable((color, "DaxRxAudio     id = \(stream.id.hex)  handle = \(stream.clientHandle.hex)  channel = \(stream.daxChannel)  ip = \(stream.ip)  slice = -not assigned-"))
+    }
+    // DaxTxAudioStream
+    for (_, stream) in radio.daxTxAudioStreams where stream.clientHandle == activeHandle {
+      self.addObjectsToTable((color, "DaxTxAudio     id = \(stream.id.hex)  handle = \(stream.clientHandle.hex)  isTransmit = \(stream.isTransmitChannel)"))
+    }
+    // DaxIqStream without a Panadapter
+    for (_, stream) in radio.daxIqStreams where stream.clientHandle == activeHandle && stream.pan == 0 {
+      self.addObjectsToTable((color, "DaxIq          id = \(stream.id.hex)  handle = \(stream.clientHandle.hex)  channel = \(stream.channel)  rate = \(stream.rate)  ip = \(stream.ip)  panadapter = -not assigned-"))
+    }
+    // RemoteRxAudioStream
+    for (_, stream) in radio.remoteRxAudioStreams where stream.clientHandle == activeHandle {
+      self.addObjectsToTable((color, "RemoteRxAudio  id = \(stream.id.hex)  handle = \(stream.clientHandle.hex)  compression = \(stream.compression)"))
+    }
+    // RemoteTxAudioStream
+    for (_, stream) in radio.remoteTxAudioStreams where stream.clientHandle == activeHandle {
+      self.addObjectsToTable((color, "RemoteTxAudio  id = \(stream.id.hex)  handle = \(stream.clientHandle.hex)  compression = \(stream.compression)  ip = \(stream.ip)"))
+    }
+    // DaxMicAudioStream
+    for (_, stream) in radio.daxMicAudioStreams where stream.clientHandle == activeHandle {
+      self.addObjectsToTable((color, "DaxMicAudio    id = \(stream.id.hex)  handle = \(stream.clientHandle.hex)  ip = \(stream.ip)"))
+    }
+    
+    // Panadapters & its accompanying objects
+    for (_, panadapter) in radio.panadapters {
+      if panadapter.clientHandle != activeHandle { continue }
+      
+      if radio.version.isNewApi {
+        self.addObjectsToTable((color, "Panadapter     client = \(panadapter.clientHandle.hex)  id = \(panadapter.id.hex)  center = \(panadapter.center.hzToMhz)  bandwidth = \(panadapter.bandwidth.hzToMhz)"))
+      } else {
+        self.addObjectsToTable((color, "Panadapter     id = \(panadapter.id.hex)  center = \(panadapter.center.hzToMhz)  bandwidth = \(panadapter.bandwidth.hzToMhz)"))
+      }
+      // Waterfall
+      for (_, waterfall) in radio.waterfalls where panadapter.id == waterfall.panadapterId {
+        self.addObjectsToTable((color, "      Waterfall   id = \(waterfall.id.hex)  autoBlackEnabled = \(waterfall.autoBlackEnabled),  colorGain = \(waterfall.colorGain),  blackLevel = \(waterfall.blackLevel),  duration = \(waterfall.lineDuration)"))
+      }
+      
+      // IqStream
+      for (_, iqStream) in radio.iqStreams where panadapter.id == iqStream.pan {
+        self.addObjectsToTable((color, "      Iq          id = \(iqStream.id.hex)"))
+      }
+      
+      // DaxIqStream
+      for (_, daxIqStream) in radio.daxIqStreams where panadapter.id == daxIqStream.pan {
+        self.addObjectsToTable((color, "      DaxIq       id = \(daxIqStream.id.hex)"))
+      }
+      
+      // Slice(s) & their accompanying objects
+      for (_, slice) in radio.slices where panadapter.id == slice.panadapterId {
+        self.addObjectsToTable((color, "      Slice       id = \(slice.id)  frequency = \(slice.frequency.hzToMhz)  mode = \(slice.mode.padTo(4))  filterLow = \(String(format: "% 5d", slice.filterLow))  filterHigh = \(String(format: "% 5d", slice.filterHigh))  active = \(slice.active)  locked = \(slice.locked)"))
+        
+        // AudioStream
+        for (_, stream) in radio.audioStreams where stream.slice?.id == slice.id {
+          self.addObjectsToTable((color, "          Audio       id = \(stream.id.hex)  ip = \(stream.ip)  port = \(stream.port)"))
+        }
+        
+        // DaxRxAudioStream
+        for (_, stream) in radio.daxRxAudioStreams where stream.slice?.id == slice.id {
+          self.addObjectsToTable((color, "          DaxAudio    id = \(stream.id.hex)  channel = \(stream.daxChannel)  ip = \(stream.ip)"))
+        }
+        
+        // Meters
+        for (_, meter) in radio.meters.sorted(by: { $0.value.id < $1.value.id }) {
+          if meter.source == "slc" && meter.group == String(slice.id) {
+            self.addObjectsToTable((color, "          Meter id = \(meter.id)  name = \(meter.name.padTo(12))  units = \(meter.units.padTo(5))  low = \(String(format: "% 7.2f", meter.low))  high = \(String(format: "% 7.2f", meter.high))  fps = \(String(format: "% 3d", meter.fps))  desc = \(meter.desc)  "))
+          }
+        }
       }
     }
   }
