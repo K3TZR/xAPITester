@@ -10,28 +10,6 @@ import Cocoa
 import xLib6000
 import SwiftyUserDefaults
 
-// --------------------------------------------------------------------------------
-// MARK: - RadioPicker Delegate definition
-// --------------------------------------------------------------------------------
-
-protocol RadioPickerDelegate: class {
-  
-  var token: Token? { get set }
-  
-  /// Open the specified Radio
-  ///
-  /// - Parameters:
-  ///   - radio:              a RadioParameters struct
-  ///   - remote:             remote / local
-  ///   - handle:             remote handle
-  ///
-  func openRadio(_ radio: DiscoveryPacket, isWan: Bool, wanHandle: String)
-
-  /// Close the active Radio
-  ///
-  func closeRadio(_ discoveryPacket: DiscoveryPacket)
-}
-
 // ------------------------------------------------------------------------------
 // MARK: - ViewController Class implementation
 // ------------------------------------------------------------------------------
@@ -67,7 +45,7 @@ public final class ViewController             : NSViewController, RadioPickerDel
   private var _previousCommand                = ""                          // last command issued
   private var _commandsIndex                  = 0
   private var _commandsArray                  = [String]()                  // commands history
-  private var _radioPickerTabViewController   : NSTabViewController?
+  private var _radioPickerViewController      : NSViewController?
   private var _splitViewVC                    : SplitViewController?
   private var _appFolderUrl                   : URL!
   private var _macros                         : Macros!
@@ -177,6 +155,14 @@ public final class ViewController             : NSViewController, RadioPickerDel
     }
   }
   
+  
+  
+  func closeRadioPicker() {
+    Swift.print("Close RadioPicker")
+    
+    _radioPickerViewController?.dismiss(self)
+  }
+
   // ----------------------------------------------------------------------------
   // MARK: - Action methods
   
@@ -368,19 +354,15 @@ public final class ViewController             : NSViewController, RadioPickerDel
   @IBAction func openRadioPicker(_ sender: AnyObject) {
     
     // get an instance of the RadioPicker
-    _radioPickerTabViewController = storyboard!.instantiateController(withIdentifier: kSBI_RadioPicker) as? NSTabViewController
+    _radioPickerViewController = storyboard!.instantiateController(withIdentifier: "RadioPicker") as? NSViewController
     
-    // make this View Controller the delegate of the RadioPickers
-    _radioPickerTabViewController!.tabViewItems[kLocalTab].viewController!.representedObject = self
-    _radioPickerTabViewController!.tabViewItems[kRemoteTab].viewController!.representedObject = self
-
-    // select the last-used tab
-    _radioPickerTabViewController!.selectedTabViewItemIndex = ( Defaults[.showRemoteTabView] == false ? kLocalTab : kRemoteTab )
+    // make this View Controller the delegate of the RadioPicker
+    _radioPickerViewController!.representedObject = self
 
     DispatchQueue.main.async {
       
       // show the RadioPicker sheet
-      self.presentAsSheet(self._radioPickerTabViewController!)
+      self.presentAsSheet(self._radioPickerViewController!)
     }
   }
   /// Respond to the Run button (in the Macros box)
@@ -808,14 +790,14 @@ public final class ViewController             : NSViewController, RadioPickerDel
   ///   - wanHandle:            Wan handle (if any)
   /// - Returns:                success / failure
   ///
-  func connectRadio(_ discoveredRadio: DiscoveryPacket?, isWan: Bool = false, wanHandle: String = "", pendingDisconnect: Handle? = nil) {
+  func connectRadio(_ discoveredRadio: DiscoveryPacket?, pendingDisconnect: Handle? = nil) {
     
-    if let _ = _radioPickerTabViewController {
-      self._radioPickerTabViewController = nil
+    if let _ = _radioPickerViewController {
+      self._radioPickerViewController = nil
     }
     
     // exit if no Radio selected
-    guard let selectedRadio = discoveredRadio else { return }
+    guard let radio = discoveredRadio else { return }
     
     // clear the previous Commands, Replies & Messages
     if Defaults[.clearAtConnect] { _splitViewVC?.messages.removeAll() ;_splitViewVC?._tableView.reloadData() }
@@ -830,22 +812,17 @@ public final class ViewController             : NSViewController, RadioPickerDel
     // Is there a client that must be disconnected first?
     if let handle = pendingDisconnect {
       // YES, connect to the radio as a non-GUI
-      if _api.connect(selectedRadio,
+      if _api.connect(radio,
                       clientStation: "",
                       programName: Logger.kAppName,
                       clientId: nil,
                       isGui: false,
-                      isWan: isWan,
-                      wanHandle: wanHandle) {
+                      isWan: radio.isWan,
+                      wanHandle: radio.wanHandle) {
         
         // send a disconnect message
-        let version = Version(selectedRadio.firmwareVersion)
-        
-        
-        Swift.print("InUseHost = \(selectedRadio.inUseHost), InUseIp = \(selectedRadio.inUseIp)")
-        
-        if selectedRadio.guiClientHosts.contains(".local") { Swift.print("Existing connection is LOCAL") } else { Swift.print("Existing connection is SMARTLINK") }
-        
+        let version = Version(radio.firmwareVersion)
+                
         if version.isNewApi {
           Swift.print("sendDisconnect")
           _api.sendDisconnect(handle)
@@ -860,23 +837,23 @@ public final class ViewController             : NSViewController, RadioPickerDel
       }
     }
     // connect to the radio
-    if _api.connect(selectedRadio,
+    if _api.connect(radio,
                     clientStation: Logger.kAppName,
                     programName: Logger.kAppName,
                     clientId: Defaults[.isGui] ? _clientId : nil,
                     isGui: Defaults[.isGui],
-                    isWan: isWan,
-                    wanHandle: wanHandle) {
+                    isWan: radio.isWan,
+                    wanHandle: radio.wanHandle) {
             
       _startTimestamp = Date()
       
-      updateButtonStates(connected: true, isWan)
+      updateButtonStates(connected: true, radio.isWan)
       title()
       
       // WAN connect
-      if isWan {
+      if radio.isWan {
         _api.isWan = true
-        _api.connectionHandleWan = wanHandle
+        _api.connectionHandleWan = radio.wanHandle
       } else {
         _api.isWan = false
         _api.connectionHandleWan = ""
@@ -887,7 +864,7 @@ public final class ViewController             : NSViewController, RadioPickerDel
     }
   }
 
-  func openRadio(_ discoveryPacket: DiscoveryPacket, isWan: Bool = false, wanHandle: String = "") {
+  func openRadio(_ discoveryPacket: DiscoveryPacket) {
     
     let status = discoveryPacket.status.lowercased()
     let guiCount = discoveryPacket.guiClients.count
@@ -897,10 +874,10 @@ public final class ViewController             : NSViewController, RadioPickerDel
     switch (isNewApi, Defaults[.isGui], status, guiCount) {
 
     case (false, false, _, _):            // oldApi, Non-GUI
-      connectRadio(discoveryPacket, isWan: isWan, wanHandle: wanHandle)
+      connectRadio(discoveryPacket)
 
     case (false, true, kAvailable, _):   // oldApi, GUI, not connected to another client
-      connectRadio(discoveryPacket, isWan: isWan, wanHandle: wanHandle)
+      connectRadio(discoveryPacket)
       
     case (false, true, kInUse, _):      // oldApi, GUI, connected to another client,, should the client be closed?
       let alert = NSAlert()
@@ -915,16 +892,16 @@ public final class ViewController             : NSViewController, RadioPickerDel
         // close the connected Radio if the YES button pressed
 
         switch response {
-        case NSApplication.ModalResponse.alertFirstButtonReturn:  self.connectRadio(discoveryPacket, isWan: isWan, wanHandle: wanHandle, pendingDisconnect: 1)
+        case NSApplication.ModalResponse.alertFirstButtonReturn:  self.connectRadio(discoveryPacket, pendingDisconnect: 1)
         default:  break
         }
       })
 
     case (true, false, _, _):             // newApi, Non-GUI
-      connectRadio(discoveryPacket, isWan: isWan, wanHandle: wanHandle)
+      connectRadio(discoveryPacket)
 
     case (true, true, kAvailable, 0):    // newApi, GUI, not connected to another client
-      connectRadio(discoveryPacket, isWan: isWan, wanHandle: wanHandle)
+      connectRadio(discoveryPacket)
 
     case (true, true, kAvailable, _):    // newApi, GUI, connected to another client, should the client be closed?
       let alert = NSAlert()
@@ -944,8 +921,8 @@ public final class ViewController             : NSViewController, RadioPickerDel
         // close the connected Radio if the YES button pressed
 
         switch response {
-        case NSApplication.ModalResponse.alertFirstButtonReturn:  self.connectRadio(discoveryPacket, isWan: isWan, wanHandle: wanHandle, pendingDisconnect: discoveryPacket.guiClients[0].handle)
-        case NSApplication.ModalResponse.alertSecondButtonReturn: self.connectRadio(discoveryPacket, isWan: isWan, wanHandle: wanHandle)
+        case NSApplication.ModalResponse.alertFirstButtonReturn:  self.connectRadio(discoveryPacket, pendingDisconnect: discoveryPacket.guiClients[0].handle)
+        case NSApplication.ModalResponse.alertSecondButtonReturn: self.connectRadio(discoveryPacket)
         default:  break
         }
       })
@@ -967,8 +944,8 @@ public final class ViewController             : NSViewController, RadioPickerDel
         alert.beginSheetModal(for: view.window!, completionHandler: { (response) in
 
           switch response {
-          case NSApplication.ModalResponse.alertFirstButtonReturn:  self.connectRadio(discoveryPacket, isWan: isWan, wanHandle: wanHandle, pendingDisconnect: discoveryPacket.guiClients[0].handle)
-          case NSApplication.ModalResponse.alertSecondButtonReturn: self.connectRadio(discoveryPacket, isWan: isWan, wanHandle: wanHandle, pendingDisconnect: discoveryPacket.guiClients[1].handle)
+          case NSApplication.ModalResponse.alertFirstButtonReturn:  self.connectRadio(discoveryPacket, pendingDisconnect: discoveryPacket.guiClients[0].handle)
+          case NSApplication.ModalResponse.alertSecondButtonReturn: self.connectRadio(discoveryPacket, pendingDisconnect: discoveryPacket.guiClients[1].handle)
           default:  break
           }
         })

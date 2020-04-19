@@ -1,5 +1,5 @@
 //
-//  WANRadioPickerViewController.swift
+//  RadioPickerViewController.swift
 //  CommonCode
 //
 //  Created by Mario Illgen on 08.02.18.
@@ -21,7 +21,7 @@ public struct Token {
 }
 
 // --------------------------------------------------------------------------------
-// MARK: - RadioPicker Delegate definition
+// MARK: - RadioPicker Delegate protocol
 // --------------------------------------------------------------------------------
 
 protocol RadioPickerDelegate             : class {
@@ -210,27 +210,24 @@ final class RadioPickerViewController    : NSViewController, NSTableViewDelegate
   ///
   /// - Parameter sender:     the button
   ///
-  @IBAction func quitRadio(_ sender: AnyObject) {
-    
-    dismiss(sender)
-    
-    // perform an orderly disconnect of all the components
-    _api.disconnect(reason: .normal)
-    
-    _log.logMessage("Application closed by user", .info, #function, #file, #line)
-    DispatchQueue.main.async {
-      
-      NSApp.terminate(self)
-    }
-  }
+//  @IBAction func quitRadio(_ sender: AnyObject) {
+//
+//    dismiss(sender)
+//
+//    // perform an orderly disconnect of all the components
+//    _api.disconnect(reason: .normal)
+//
+//    _log.logMessage("Application closed by user", .info, #function, #file, #line)
+//    DispatchQueue.main.async {
+//
+//      NSApp.terminate(self)
+//    }
+//  }
   /// Respond to the Close button
   ///
   /// - Parameter sender:         the button
   ///
-  @IBAction func closeButton(_ sender: AnyObject) {
-    
-//    // diconnect from WAN server
-//    _wanServer?.disconnect()
+  @IBAction func closeButton(_ sender: NSButton) {
     
     dismiss(sender)
   }
@@ -238,7 +235,7 @@ final class RadioPickerViewController    : NSViewController, NSTableViewDelegate
   ///
   /// - Parameter:                the button
   ///
-  @IBAction func selectButton( _: AnyObject ) {
+  @IBAction func selectButton( _: NSButton ) {
     
     // attempt to Connect / Disconnect the selected Radio
     connectDisconnect()
@@ -254,12 +251,9 @@ final class RadioPickerViewController    : NSViewController, NSTableViewDelegate
   }
   
   @IBAction func testButton(_ sender: NSButton) {
-
-    _log.logMessage("SmartLink Test initiated", .info, #function, #file, #line)
-
     _testIndicator.boolState = false
 
-    _wanServer?.sendTestConnection(radioSerial: _discoveryPacket!.serialNumber)
+    _wanServer?.sendTestConnection(for: _discoveryPacket!)
   }
   
   // ----------------------------------------------------------------------------
@@ -276,11 +270,11 @@ final class RadioPickerViewController    : NSViewController, NSTableViewDelegate
     if _selectButton.title == kConnectTitle {
       
       // CONNECT
-      openRadio()
+      openRadio(discoveryPacket)
       
       // close the picker
-      DispatchQueue.main.async { [unowned self] in
-        self.closeButton(self)
+      DispatchQueue.main.async { [weak self] in
+        self?.dismiss(self)
       }
       
     } else {
@@ -291,40 +285,33 @@ final class RadioPickerViewController    : NSViewController, NSTableViewDelegate
 
   /// Open a Radio & close the Picker
   ///
-  private func openRadio() {
+  private func openRadio(_ packet: DiscoveryPacket) {
     
-    getAuthentification(for: _discoveryPacket)
+    getAuthentification(for: packet)
     
-    DispatchQueue.main.async { [unowned self] in
-      self.closeButton(self)
+    DispatchQueue.main.async { [weak self] in
+      self?.dismiss(self)
     }
   }
   /// Start the process to get Authentifictaion for radio connection
   ///
   /// - Parameter radio: Radio to connect to
   ///
-  private func getAuthentification(for discoveryPacket: DiscoveryPacket?) {
+  private func getAuthentification(for packet: DiscoveryPacket) {
     
-    // FIXME: Is this correct
-    
-    if let packet = discoveryPacket {
+    // is a "Hole Punch" required?
+    if packet.requiresHolePunch {
       
-      // is a "Hole Punch" required?
-      if packet.requiresHolePunch {
-        
-        // YES
-        _wanServer?.sendConnectMessageForRadio(radioSerial: packet.serialNumber, holePunchPort: packet.negotiatedHolePunchPort)
-
-      } else {
-        
-        // NO
-        _wanServer?.sendConnectMessageForRadio(radioSerial: packet.serialNumber)
-      }
+      // YES
+      _wanServer?.sendConnectMessage(for: packet)
+      
+    } else {
+      
+      // NO
+      _wanServer?.sendConnectMessage(for: packet)
     }
   }
   /// Login or Logout to Auth0
-  ///
-  /// - Parameter open: Open/Close
   ///
   private func logInOut() {
     
@@ -333,7 +320,7 @@ final class RadioPickerViewController    : NSViewController, NSTableViewDelegate
       // Login to auth0
       // get an instance of Auth0 controller
       _auth0ViewController = storyboard!.instantiateController(withIdentifier: "Auth0Login") as? Auth0ViewController
-
+      
       // make this View Controller the delegate of the Auth0 controller
       _auth0ViewController!.representedObject = self
       
@@ -382,9 +369,6 @@ final class RadioPickerViewController    : NSViewController, NSTableViewDelegate
     // instantiate a WanServer instance
     _wanServer = WanServer(delegate: self)
     
-//    // clear the reply table
-//    _delegate?.clearTable()
-
     // connect with pinger to avoid the SmartLink server to disconnect if we take too long (>30s)
     // to select and connect to a radio
     if _wanServer!.connect(appName: Logger.kAppName, platform: kPlatform, token: token, ping: true) {

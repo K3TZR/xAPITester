@@ -190,7 +190,7 @@ final class LANRadioPickerViewController    : NSViewController, NSTableViewDeleg
     if _selectButton.title == kConnectTitle {
 
       // CONNECT, tell the delegate to connect to the selected Radio
-      _delegate?.openRadio(discoveryPacket, isWan: false, wanHandle: "")
+      _delegate?.openRadio(discoveryPacket)
       
       // close the picker
       DispatchQueue.main.async { [unowned self] in
