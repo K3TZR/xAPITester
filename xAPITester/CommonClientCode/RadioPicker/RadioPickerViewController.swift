@@ -71,7 +71,6 @@ final class RadioPickerViewController    : NSViewController, NSTableViewDelegate
   }
   private var _discoveryPacket              : DiscoveryPacket?
   private var _wanServer                    : WanServer?
-//  private var _parentVc                     : NSViewController!
 
   // constants
   private let kApplicationJson              = "application/json"
@@ -206,23 +205,6 @@ final class RadioPickerViewController    : NSViewController, NSTableViewDelegate
   // ----------------------------------------------------------------------------
   // MARK: - Action methods
   
-  /// Respond to the Quit menu item
-  ///
-  /// - Parameter sender:     the button
-  ///
-//  @IBAction func quitRadio(_ sender: AnyObject) {
-//
-//    dismiss(sender)
-//
-//    // perform an orderly disconnect of all the components
-//    _api.disconnect(reason: .normal)
-//
-//    _log.logMessage("Application closed by user", .info, #function, #file, #line)
-//    DispatchQueue.main.async {
-//
-//      NSApp.terminate(self)
-//    }
-//  }
   /// Respond to the Close button
   ///
   /// - Parameter sender:         the button
@@ -263,14 +245,18 @@ final class RadioPickerViewController    : NSViewController, NSTableViewDelegate
   ///
   private func connectDisconnect() {
     
-    guard let discoveryPacket = _discoveryPacket else { return }
+    guard let packet = _discoveryPacket else { return }
     guard let delegate = _delegate else { return }
 
     // Connect / Disconnect
     if _selectButton.title == kConnectTitle {
       
       // CONNECT
-      openRadio(discoveryPacket)
+      if packet.isWan {
+        _wanServer?.sendConnectMessage(for: packet)
+      } else {
+        delegate.openRadio(packet)
+      }
       
       // close the picker
       DispatchQueue.main.async { [weak self] in
@@ -279,36 +265,7 @@ final class RadioPickerViewController    : NSViewController, NSTableViewDelegate
       
     } else {
       // DISCONNECT, RadioPicker remains open
-      delegate.closeRadio(discoveryPacket)
-    }
-  }
-
-  /// Open a Radio & close the Picker
-  ///
-  private func openRadio(_ packet: DiscoveryPacket) {
-    
-    getAuthentification(for: packet)
-    
-    DispatchQueue.main.async { [weak self] in
-      self?.dismiss(self)
-    }
-  }
-  /// Start the process to get Authentifictaion for radio connection
-  ///
-  /// - Parameter radio: Radio to connect to
-  ///
-  private func getAuthentification(for packet: DiscoveryPacket) {
-    
-    // is a "Hole Punch" required?
-    if packet.requiresHolePunch {
-      
-      // YES
-      _wanServer?.sendConnectMessage(for: packet)
-      
-    } else {
-      
-      // NO
-      _wanServer?.sendConnectMessage(for: packet)
+      delegate.closeRadio(packet)
     }
   }
   /// Login or Logout to Auth0
@@ -505,20 +462,14 @@ final class RadioPickerViewController    : NSViewController, NSTableViewDelegate
   private func setLogOnImage(from url: URL) {
     
     // get the image
-//    let image = NSImage(contentsOf: url)
-    let image = getImage(fromURL: url)
-    _gravatarView.image = image
+    _gravatarView.image = getImage(fromURL: url)
   }
-
 
   func getImage(fromURL url: URL) -> NSImage? {
       guard let data = try? Data(contentsOf: url) else { return nil }
       guard let image = NSImage(data: data) else { return nil }
       return image
   }
-
-
-
   /// check if a JWT token is valid
   ///
   /// - Parameter jwt:                  a JWT token
@@ -563,8 +514,6 @@ final class RadioPickerViewController    : NSViewController, NSTableViewDelegate
       
       wanRadioList[i].isWan = true
       Discovery.sharedInstance.processPacket(wanRadioList[i])
-      
-//      Swift.print("WanServer packet = \(wanRadioList[i].nickname), isWan = \(wanRadioList[i].lastSeen)")
     }
     
     reload()
@@ -730,7 +679,6 @@ final class RadioPickerViewController    : NSViewController, NSTableViewDelegate
   func numberOfRows(in aTableView: NSTableView) -> Int {
     
     // get the number of rows
-//    return _discoveredRadios.count
    return  Discovery.sharedInstance.discoveredRadios.count
   }
   
@@ -747,7 +695,6 @@ final class RadioPickerViewController    : NSViewController, NSTableViewDelegate
   ///
   func tableView( _ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
     
-//    let version = Version(_discoveredRadios[row].firmwareVersion)
     let version = Version(Discovery.sharedInstance.discoveredRadios[row].firmwareVersion)
 
     let type = (Discovery.sharedInstance.discoveredRadios[row].isWan ? "SMARTLINK" : "LOCAL")
@@ -757,12 +704,6 @@ final class RadioPickerViewController    : NSViewController, NSTableViewDelegate
     
     // set the stringValue of the cell's text field to the appropriate field
     switch tableColumn!.identifier.rawValue {
-//    case "model":     cellView.textField!.stringValue = _discoveredRadios[row].model
-//    case "nickname":  cellView.textField!.stringValue = _discoveredRadios[row].nickname
-//    case "status":    cellView.textField!.stringValue = _discoveredRadios[row].status
-//    case "stations":  cellView.textField!.stringValue = (version.isNewApi ? _discoveredRadios[row].guiClientStations : "n/a")
-//    case "publicIp":  cellView.textField!.stringValue = _discoveredRadios[row].publicIp
-//    case "model":     cellView.textField!.stringValue = Discovery.sharedInstance.discoveredRadios[row].model
     case "model":     cellView.textField!.stringValue = type
     case "nickname":  cellView.textField!.stringValue = Discovery.sharedInstance.discoveredRadios[row].nickname
     case "status":    cellView.textField!.stringValue = Discovery.sharedInstance.discoveredRadios[row].status

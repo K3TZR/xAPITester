@@ -345,14 +345,14 @@ class SplitViewController: NSSplitViewController, ApiDelegate, NSTableViewDelega
         // what verion is the Radio?
         if radio.version.isNewApi {
           // newApi
-          for client in radio.discoveryPacket.guiClients {
+          for (handle, client) in radio.discoveryPacket.guiClients {
             
             color = objectColors[i]
             
             if self._parent!._stationsPopUp.titleOfSelectedItem == "All" || self._parent!._stationsPopUp.titleOfSelectedItem == client.station {
-              activeHandle = client.handle
+              activeHandle = handle
               
-              self.addObjectsToTable((color, "Gui Client     station = \(client.station.padTo(15))  handle = \(client.handle.hex)  id = \(client.clientId ?? "unknown")  localPtt = \(client.isLocalPtt ? "Yes" : "No ")  available = \(radio.discoveryPacket.status.lowercased() == "available" ? "Yes" : "No ")  program = \(client.program)"))
+              self.addObjectsToTable((color, "Gui Client     station = \(client.station.padTo(15))  handle = \(handle.hex)  id = \(client.clientId ?? "unknown")  localPtt = \(client.isLocalPtt ? "Yes" : "No ")  available = \(radio.discoveryPacket.status.lowercased() == "available" ? "Yes" : "No ")  program = \(client.program)"))
               
               self.addSelectedObjects(activeHandle, radio, color)
             }
@@ -459,7 +459,7 @@ class SplitViewController: NSSplitViewController, ApiDelegate, NSTableViewDelega
       if panadapter.clientHandle != activeHandle { continue }
       
       if radio.version.isNewApi {
-        self.addObjectsToTable((color, "Panadapter     client = \(panadapter.clientHandle.hex)  id = \(panadapter.id.hex)  center = \(panadapter.center.hzToMhz)  bandwidth = \(panadapter.bandwidth.hzToMhz)"))
+        self.addObjectsToTable((color, "Panadapter     handle = \(panadapter.clientHandle.hex)  id = \(panadapter.id.hex)  center = \(panadapter.center.hzToMhz)  bandwidth = \(panadapter.bandwidth.hzToMhz)"))
       } else {
         self.addObjectsToTable((color, "Panadapter     id = \(panadapter.id.hex)  center = \(panadapter.center.hzToMhz)  bandwidth = \(panadapter.bandwidth.hzToMhz)"))
       }
