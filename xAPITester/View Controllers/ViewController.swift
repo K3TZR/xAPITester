@@ -580,8 +580,7 @@ public final class ViewController: NSViewController, RadioPickerDelegate,  NSTex
   /// Enable / Disable various UI elements
   ///
   private func updateButtonStates() {
-    
-    
+        
     DispatchQueue.main.async { [unowned self] in
       if let radio = self._api.radio {
         
@@ -789,9 +788,7 @@ public final class ViewController: NSViewController, RadioPickerDelegate,  NSTex
   ///
   /// - Parameters:
   ///   - radio:                the DiscoveryStruct
-  ///   - isWan:                Local / Wan
-  ///   - wanHandle:            Wan handle (if any)
-  /// - Returns:                success / failure
+  ///   - pendingDisconnect:    type, if any
   ///
   func connectRadio(_ discoveredRadio: DiscoveryPacket?, pendingDisconnect: Api.PendingDisconnect = .none) {
     

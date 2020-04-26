@@ -41,9 +41,9 @@
         "package": "xLib6000",
         "repositoryURL": "https://github.com/K3TZR/xLib6000.git",
         "state": {
-          "branch": "master",
+          "branch": null,
           "revision": "e6268ebd3ecb6906dbc73c2dd8364de24e3204e7",
-          "version": null
+          "version": "1.2.11"
         }
       }
     ]

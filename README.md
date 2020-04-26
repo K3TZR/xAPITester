@@ -3,12 +3,12 @@
 # xAPITester
 
 ## API Explorer for the FlexRadio (TM) 6000 series software defined radios.
-###      (currently supports Radios with Version 3.1.8 or lower, see Evolution below)
+###       (see Evolution below for radio versions that are supported)
 
 ### Built on:
 
-*  macOS 10.15.4 (Deployment Target of macOS 10.11)
-*  Xcode 11.4 (11E146)
+*  macOS 10.15.4
+*  Xcode 11.4.1 (11E503a)
 *  Swift 5.2
 
 
@@ -32,17 +32,12 @@ Please send any bugs / comments / questions to douglas.adams@me.com
 
 ## Evolution
 
-Please see ChangeLog.txt for a running list of changes.
-
-This version currently supports Radios using the Flex v2 API. A Future version of this library will support all Radio versions.
-
 Flex Radios can have one of four different version groups:
-*  v1.x.x, the v1 API
+*  v1.x.x, the v1 API - untested at this time
 *  v2.0.x thru v2.4.9, the v2 API <<-- CURRENTLY SUPPORTED
 *  v2.5.1 to less than v3.0.0, the v3 API without MultiFlex <<-- CURRENTLY SUPPORTED
-*  v3.x.x, the v3 API with MultiFlex <<-- CURRENTLY SUPPORTED
-
-
+*  v3.0.0 thru v3.1.8, the v3 API with MultiFlex <<-- CURRENTLY SUPPORTED
+*  greater than v3.1.8 - untested at this time
 
 
 ## Credits
@@ -78,7 +73,7 @@ If you require a Mac-based Voice Keyer , please see.
 
 [![W6OP](https://img.shields.io/badge/W6OP-Voice_Keyer-informational)](https://w6op.com)
 
-## 1.1.2 Release Notes
 
-* Uses xLib6000 1.2.10
-* Options for Multiflex connections
+## 1.1.3 Release Notes
+
+* Uses xLib6000 1.2.11
