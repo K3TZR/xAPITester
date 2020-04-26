@@ -34,7 +34,6 @@
 		918725A023D63ED9009B63A3 /* HelpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9187259C23D63ED9009B63A3 /* HelpViewController.swift */; };
 		918725A123D63ED9009B63A3 /* SplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9187259D23D63ED9009B63A3 /* SplitViewController.swift */; };
 		919F57DE24193D40001956B0 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 919F57DD24193D40001956B0 /* Logger.swift */; };
-		91B1D25224205B9D00A7B5E4 /* Package.resolved in Resources */ = {isa = PBXBuildFile; fileRef = 91B1D25124205B9C00A7B5E4 /* Package.resolved */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -64,7 +63,6 @@
 		9187259D23D63ED9009B63A3 /* SplitViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SplitViewController.swift; sourceTree = "<group>"; };
 		9196148623D1372D0069AE94 /* xAPITester.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = xAPITester.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		919F57DD24193D40001956B0 /* Logger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
-		91B1D25124205B9C00A7B5E4 /* Package.resolved */ = {isa = PBXFileReference; lastKnownFileType = text; path = Package.resolved; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -85,7 +83,6 @@
 		9187255523D63C8A009B63A3 /* xAPITester */ = {
 			isa = PBXGroup;
 			children = (
-				91B1D25124205B9C00A7B5E4 /* Package.resolved */,
 				9187256423D63C8A009B63A3 /* xAPITester.entitlements */,
 				9187256823D63C8A009B63A3 /* Info.plist */,
 				9187255B23D63C8A009B63A3 /* Assets.xcassets */,
@@ -228,7 +225,6 @@
 			buildPhases = (
 				9196148223D1372D0069AE94 /* Sources */,
 				9196148323D1372D0069AE94 /* Frameworks */,
-				91B1D25324205DF200A7B5E4 /* Copy Package.resolved */,
 				9196148423D1372D0069AE94 /* Resources */,
 				910DBC6623F1009600052637 /* Increment Build Number */,
 			);
@@ -293,7 +289,6 @@
 			files = (
 				9187259923D63D8F009B63A3 /* Main.storyboard in Resources */,
 				9187257B23D63C8A009B63A3 /* xAPITester.pdf in Resources */,
-				91B1D25224205B9D00A7B5E4 /* Package.resolved in Resources */,
 				9187257E23D63C8A009B63A3 /* Assets.xcassets in Resources */,
 				9187257D23D63C8A009B63A3 /* Defaults.plist in Resources */,
 				9187259523D63CD1009B63A3 /* README.md in Resources */,
@@ -320,24 +315,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "#!/bin/sh\n\n# To make executable, use: chmod u+x Build-Versioning-Scripts/Increment_Build_Number.sh\n# to locate your target's info.plist use\n# ${PROJECT_DIR}/${INFOPLIST_FILE}\n\necho \"----\"\nbuildNumber=${CURRENT_PROJECT_VERSION}\necho \"Current Build #: $buildNumber\"\n\nbuildNumber=$(($buildNumber + 1))\necho \"Build # incremented to: $buildNumber\"\n\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $buildNumber\" \"${PROJECT_DIR}/${INFOPLIST_FILE}\"\necho \"----\"\nexit 0\n";
-		};
-		91B1D25324205DF200A7B5E4 /* Copy Package.resolved */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Copy Package.resolved";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "echo \"Source: ${PROJECT_DIR}/xAPITester.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved\"\necho \"Destination: ${PROJECT_DIR}/Package.resolved\"\ncp \"${PROJECT_DIR}/xAPITester.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved\" \"${PROJECT_DIR}/Package.resolved\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -505,7 +482,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 1.1.3;
+				MARKETING_VERSION = 1.1.5;
 				PRODUCT_BUNDLE_IDENTIFIER = net.k3tzr.xAPITester;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -536,7 +513,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 1.1.3;
+				MARKETING_VERSION = 1.1.5;
 				PRODUCT_BUNDLE_IDENTIFIER = net.k3tzr.xAPITester;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -573,7 +550,7 @@
 			repositoryURL = "https://github.com/K3TZR/xLib6000.git";
 			requirement = {
 				kind = exactVersion;
-				version = 1.2.11;
+				version = 1.2.12;
 			};
 		};
 		917AAA8323D5EDC80082FAEB /* XCRemoteSwiftPackageReference "XCGLogger" */ = {
