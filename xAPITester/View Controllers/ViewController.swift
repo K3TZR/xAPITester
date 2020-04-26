@@ -620,13 +620,18 @@ public final class ViewController: NSViewController, RadioPickerDelegate,  NSTex
     // see if there is a valid default Radio
     guard Defaults[.defaultRadioSerialNumber] != "" else { return nil }
     
+    let components = Defaults[.defaultRadioSerialNumber].split(separator: ".")
+    guard components.count == 2 else { return nil }
+    
+    let isWan = (components[0] == "wan")
+    
     // allow time to hear the UDP broadcasts
     usleep(2_000_000)
     
     // has the default Radio been found?
-    if let discoveryPacket = Discovery.sharedInstance.discoveredRadios.first(where: { $0.serialNumber == Defaults[.defaultRadioSerialNumber]} ) {
+    if let discoveryPacket = Discovery.sharedInstance.discoveredRadios.first(where: { $0.serialNumber == components[1] && $0.isWan == isWan} ) {
       
-      _log.logMessage("Default radio found, \(discoveryPacket.nickname) @ \(discoveryPacket.publicIp), serial \(discoveryPacket.serialNumber)", .info, #function, #file, #line)
+      _log.logMessage("Default radio found, \(discoveryPacket.nickname) @ \(discoveryPacket.publicIp), serial \(discoveryPacket.serialNumber), isWan = \(isWan)", .info, #function, #file, #line)
       
       return discoveryPacket
     }

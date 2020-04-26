@@ -70,7 +70,8 @@ final class RadioPickerViewController    : NSViewController, NSTableViewDelegate
     return representedObject as? RadioPickerDelegate
   }
   private var _discoveryPacket              : DiscoveryPacket?
-  private var _wanServer                    : WanServer?
+  private var _wanServer                    : WanServer?  
+  private var _rightClick                   : NSClickGestureRecognizer!
 
   // constants
   private let kApplicationJson              = "application/json"
@@ -113,6 +114,12 @@ final class RadioPickerViewController    : NSViewController, NSTableViewDelegate
     Swift.print("\(#function) - \(URL(fileURLWithPath: #file).lastPathComponent.dropLast(6))")
     #endif
     
+    // setup Right Single Click recognizer
+    _rightClick = NSClickGestureRecognizer(target: self, action: #selector(rightClick(_:)))
+    _rightClick.buttonMask = 0x02
+    _rightClick.numberOfClicksRequired = 1
+    _radioTableView.addGestureRecognizer(_rightClick)
+
     // allow the User to double-click the desired Radio
     _radioTableView.doubleAction = #selector(RadioPickerViewController.selectButton(_:))
     
@@ -240,7 +247,47 @@ final class RadioPickerViewController    : NSViewController, NSTableViewDelegate
   
   // ----------------------------------------------------------------------------
   // MARK: - Private methods
+  
+  /// Respond to a Right Click gesture
+  ///
+  /// - Parameter gr: the GestureRecognizer
+  ///
+  @objc private func rightClick(_ gr: NSClickGestureRecognizer) {
     
+    // get the "click" coordinates and convert to this View
+    let mouseLocation = gr.location(in: _radioTableView)
+
+    // Calculate the clicked row
+    let row = _radioTableView.row(at: mouseLocation)
+
+    // If the click occurred outside of a row (i.e. empty space), don't show the menu
+    guard row != -1 else { return }
+
+    // Select the clicked row, implicitly clearing the previous selection
+    _radioTableView.selectRowIndexes(IndexSet(integer: row), byExtendingSelection: false)
+
+    // create the popup menu
+    let menu = NSMenu()
+    menu.addItem(withTitle: "Set as Default", action: #selector(contextMenu(_:)), keyEquivalent: "")
+    menu.addItem(withTitle: "Clear  Default", action: #selector(contextMenu(_:)), keyEquivalent: "")
+
+    // display the popup
+    menu.popUp(positioning: menu.item(at: 0), at: mouseLocation, in: _radioTableView)
+  }
+  /// Perform the appropriate action
+  ///
+  /// - Parameter sender: a MenuItem
+  ///
+  @objc private func contextMenu(_ sender: NSMenuItem) {
+
+    let packet = Discovery.sharedInstance.discoveredRadios[_radioTableView.selectedRow]
+    
+    if sender.title == "Set as Default" {
+      Defaults[.defaultRadioSerialNumber] = (packet.isWan ? "wan" : "local") + "." + packet.serialNumber
+    } else {
+      Defaults[.defaultRadioSerialNumber] = ""
+    }
+  }
   /// Connect / Disconnect a Radio
   ///
   private func connectDisconnect() {
