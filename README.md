@@ -7,8 +7,8 @@
 
 ### Built on:
 
-*  macOS 10.15.4
-*  Xcode 11.4.1 (11E503a)
+*  macOS 10.15.5
+*  Xcode 11.5 (11E608c)
 *  Swift 5.2
 
 
@@ -36,8 +36,8 @@ Flex Radios can have one of four different version groups:
 *  v1.x.x, the v1 API - untested at this time
 *  v2.0.x thru v2.4.9, the v2 API <<-- CURRENTLY SUPPORTED
 *  v2.5.1 to less than v3.0.0, the v3 API without MultiFlex <<-- CURRENTLY SUPPORTED
-*  v3.0.0 thru v3.1.8, the v3 API with MultiFlex <<-- CURRENTLY SUPPORTED
-*  greater than v3.1.8 - untested at this time
+*  v3.0.0 thru v3.1.11, the v3 API with MultiFlex <<-- CURRENTLY SUPPORTED
+*  greater than v3.1.11 - untested at this time
 
 
 ## Credits
@@ -74,6 +74,9 @@ If you require a Mac-based Voice Keyer , please see.
 [![W6OP](https://img.shields.io/badge/W6OP-Voice_Keyer-informational)](https://w6op.com)
 
 
-## 1.1.3 Release Notes
+## 1.1.8 Release Notes
 
-* Uses xLib6000 1.2.11
+* Radio menu added to allow SmartLink Enable/Disable
+* refactored to match xSDR6000 v1.2.3 structure
+* Uses xLib6000 1.3.2
+* Uses SwiftyUserDefaults 5.0.0

@@ -28,13 +28,13 @@ class MeterViewController                     : NSViewController, NSTableViewDel
   
   internal var _filteredMeters                : [Meter] {
     get {
-      switch MetersFilters(rawValue: Defaults[.filterMetersByTag]) ?? .none {
+      switch MetersFilters(rawValue: Defaults.filterMetersByTag) ?? .none {
       
       case .none:     return _meters
-      case .source:   return _meters.filter { $0.source == Defaults[.filterMeters] }
-      case .number:   return _meters.filter { String($0.id) == Defaults[.filterMeters] }
-      case .name:     return _meters.filter { $0.name == Defaults[.filterMeters] }
-      case .group:    return _meters.filter { $0.group == Defaults[.filterMeters] }
+      case .source:   return _meters.filter { $0.source == Defaults.filterMeters }
+      case .number:   return _meters.filter { String($0.id) == Defaults.filterMeters }
+      case .name:     return _meters.filter { $0.name == Defaults.filterMeters }
+      case .group:    return _meters.filter { $0.group == Defaults.filterMeters }
       }
     }}
 
@@ -68,8 +68,8 @@ class MeterViewController                     : NSViewController, NSTableViewDel
   @IBAction func updateFilterBy(_ sender: NSPopUpButton) {
     
     // clear the Filter string field
-    Defaults[.filterMeters] = ""
-    Defaults[.filterMetersByTag] = sender.selectedTag()
+    Defaults.filterMeters = ""
+    Defaults.filterMetersByTag = sender.selectedTag()
     
     // force a redraw
     reloadMetersTable()
@@ -80,7 +80,7 @@ class MeterViewController                     : NSViewController, NSTableViewDel
   ///
   @IBAction func updateFilterText(_ sender: NSTextField) {
     
-    Defaults[.filterMeters] = sender.stringValue
+    Defaults.filterMeters = sender.stringValue
     
     // force a redraw
     reloadMetersTable()
@@ -95,7 +95,7 @@ class MeterViewController                     : NSViewController, NSTableViewDel
     
     DispatchQueue.main.async { [unowned self] in
 
-      self.filterMetersText.stringValue = Defaults[.filterMeters]
+      self.filterMetersText.stringValue = Defaults.filterMeters
 
       // reload the table
       self._tableView.reloadData()
@@ -110,11 +110,20 @@ class MeterViewController                     : NSViewController, NSTableViewDel
   ///
   private func addNotifications() {
     
-    NC.makeObserver(self, with: #selector(meterAddedRemoved(_:)), of: .meterHasBeenAdded)
-    
-    NC.makeObserver(self, with: #selector(meterAddedRemoved(_:)), of: .meterWillBeRemoved)
+    NC.makeObserver(self, with: #selector(meterAddedRemoved(_:)), of: .meterAdded)
+    NC.makeObserver(self, with: #selector(meterAddedRemoved(_:)), of: .sliceMeterAdded)
+    NC.makeObserver(self, with: #selector(meterAddedRemoved(_:)), of: .txMeterAdded)
+    NC.makeObserver(self, with: #selector(meterAddedRemoved(_:)), of: .pcwMeterAdded)
+    NC.makeObserver(self, with: #selector(meterAddedRemoved(_:)), of: .paramMeterAdded)
+    NC.makeObserver(self, with: #selector(meterAddedRemoved(_:)), of: .cwMeterAdded)
+    NC.makeObserver(self, with: #selector(meterAddedRemoved(_:)), of: .meterRemoved)
     
     NC.makeObserver(self, with: #selector(meterUpdated(_:)), of: .meterUpdated)
+    NC.makeObserver(self, with: #selector(meterUpdated(_:)), of: .sliceMeterUpdated)
+    NC.makeObserver(self, with: #selector(meterUpdated(_:)), of: .txMeterUpdated)
+    NC.makeObserver(self, with: #selector(meterUpdated(_:)), of: .pcwMeterUpdated)
+    NC.makeObserver(self, with: #selector(meterUpdated(_:)), of: .paramMeterUpdated)
+    NC.makeObserver(self, with: #selector(meterUpdated(_:)), of: .cwMeterUpdated)
   }
   /// Process meterHasBeenAdded or meterWillBeRemoved Notification
   ///

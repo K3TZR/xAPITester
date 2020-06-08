@@ -7,12 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9125201C24745B350024C575 /* RadioManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9125201A24745B350024C575 /* RadioManager.swift */; };
+		9125202224746CFF0024C575 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9125202124746CFF0024C575 /* ViewController.swift */; };
+		916E98CB246C348C00287335 /* WanManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 916E98CA246C348C00287335 /* WanManager.swift */; };
 		917AAA8223D5EDAE0082FAEB /* xLib6000 in Frameworks */ = {isa = PBXBuildFile; productRef = 917AAA8123D5EDAE0082FAEB /* xLib6000 */; };
 		917AAA8523D5EDC80082FAEB /* ObjcExceptionBridging in Frameworks */ = {isa = PBXBuildFile; productRef = 917AAA8423D5EDC80082FAEB /* ObjcExceptionBridging */; };
 		917AAA8723D5EDC80082FAEB /* XCGLogger in Frameworks */ = {isa = PBXBuildFile; productRef = 917AAA8623D5EDC80082FAEB /* XCGLogger */; };
 		917AAA8A23D5EDFA0082FAEB /* SwiftyUserDefaults in Frameworks */ = {isa = PBXBuildFile; productRef = 917AAA8923D5EDFA0082FAEB /* SwiftyUserDefaults */; };
 		9187257B23D63C8A009B63A3 /* xAPITester.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 9187255723D63C8A009B63A3 /* xAPITester.pdf */; };
-		9187257D23D63C8A009B63A3 /* Defaults.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9187255A23D63C8A009B63A3 /* Defaults.plist */; };
 		9187257E23D63C8A009B63A3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9187255B23D63C8A009B63A3 /* Assets.xcassets */; };
 		9187258523D63C8A009B63A3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9187256523D63C8A009B63A3 /* AppDelegate.swift */; };
 		9187258623D63C8A009B63A3 /* AppExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9187256723D63C8A009B63A3 /* AppExtensions.swift */; };
@@ -30,15 +32,17 @@
 		9187259523D63CD1009B63A3 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 9187259423D63CD1009B63A3 /* README.md */; };
 		9187259923D63D8F009B63A3 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9187259823D63D8F009B63A3 /* Main.storyboard */; };
 		9187259E23D63ED9009B63A3 /* MeterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9187259A23D63ED9009B63A3 /* MeterViewController.swift */; };
-		9187259F23D63ED9009B63A3 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9187259B23D63ED9009B63A3 /* ViewController.swift */; };
 		918725A023D63ED9009B63A3 /* HelpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9187259C23D63ED9009B63A3 /* HelpViewController.swift */; };
 		918725A123D63ED9009B63A3 /* SplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9187259D23D63ED9009B63A3 /* SplitViewController.swift */; };
 		919F57DE24193D40001956B0 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 919F57DD24193D40001956B0 /* Logger.swift */; };
+		91CF6DB3248D5D3B00AE8DB6 /* RadioPicker.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 91CF6DB2248D5D3B00AE8DB6 /* RadioPicker.storyboard */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		9125201A24745B350024C575 /* RadioManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RadioManager.swift; sourceTree = "<group>"; };
+		9125202124746CFF0024C575 /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ViewController.swift; path = xAPITester/Radio/ViewController.swift; sourceTree = SOURCE_ROOT; };
+		916E98CA246C348C00287335 /* WanManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WanManager.swift; sourceTree = "<group>"; };
 		9187255723D63C8A009B63A3 /* xAPITester.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = xAPITester.pdf; sourceTree = "<group>"; };
-		9187255A23D63C8A009B63A3 /* Defaults.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Defaults.plist; sourceTree = "<group>"; };
 		9187255B23D63C8A009B63A3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9187256423D63C8A009B63A3 /* xAPITester.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = xAPITester.entitlements; sourceTree = "<group>"; };
 		9187256523D63C8A009B63A3 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -58,11 +62,11 @@
 		9187259423D63CD1009B63A3 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		9187259823D63D8F009B63A3 /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 		9187259A23D63ED9009B63A3 /* MeterViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MeterViewController.swift; sourceTree = "<group>"; };
-		9187259B23D63ED9009B63A3 /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		9187259C23D63ED9009B63A3 /* HelpViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HelpViewController.swift; sourceTree = "<group>"; };
 		9187259D23D63ED9009B63A3 /* SplitViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SplitViewController.swift; sourceTree = "<group>"; };
 		9196148623D1372D0069AE94 /* xAPITester.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = xAPITester.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		919F57DD24193D40001956B0 /* Logger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
+		91CF6DB2248D5D3B00AE8DB6 /* RadioPicker.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = RadioPicker.storyboard; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -80,6 +84,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		9125201E24745B4D0024C575 /* Radio */ = {
+			isa = PBXGroup;
+			children = (
+				916E98CA246C348C00287335 /* WanManager.swift */,
+				9125201A24745B350024C575 /* RadioManager.swift */,
+			);
+			path = Radio;
+			sourceTree = "<group>";
+		};
 		9187255523D63C8A009B63A3 /* xAPITester */ = {
 			isa = PBXGroup;
 			children = (
@@ -87,8 +100,10 @@
 				9187256823D63C8A009B63A3 /* Info.plist */,
 				9187255B23D63C8A009B63A3 /* Assets.xcassets */,
 				9187259823D63D8F009B63A3 /* Main.storyboard */,
+				91CF6DB2248D5D3B00AE8DB6 /* RadioPicker.storyboard */,
 				9187256523D63C8A009B63A3 /* AppDelegate.swift */,
 				918725A423D8B2EF009B63A3 /* Extensions */,
+				9125201E24745B4D0024C575 /* Radio */,
 				918725A523D8B2FF009B63A3 /* View Controllers */,
 				9187256923D63C8A009B63A3 /* CommonClientCode */,
 				9187255623D63C8A009B63A3 /* Documentation */,
@@ -174,7 +189,7 @@
 		918725A523D8B2FF009B63A3 /* View Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				9187259B23D63ED9009B63A3 /* ViewController.swift */,
+				9125202124746CFF0024C575 /* ViewController.swift */,
 				9187259D23D63ED9009B63A3 /* SplitViewController.swift */,
 				9187259A23D63ED9009B63A3 /* MeterViewController.swift */,
 				9187259C23D63ED9009B63A3 /* HelpViewController.swift */,
@@ -186,7 +201,6 @@
 			isa = PBXGroup;
 			children = (
 				919F57DD24193D40001956B0 /* Logger.swift */,
-				9187255A23D63C8A009B63A3 /* Defaults.plist */,
 			);
 			path = Supporting;
 			sourceTree = "<group>";
@@ -288,8 +302,8 @@
 			files = (
 				9187259923D63D8F009B63A3 /* Main.storyboard in Resources */,
 				9187257B23D63C8A009B63A3 /* xAPITester.pdf in Resources */,
+				91CF6DB3248D5D3B00AE8DB6 /* RadioPicker.storyboard in Resources */,
 				9187257E23D63C8A009B63A3 /* Assets.xcassets in Resources */,
-				9187257D23D63C8A009B63A3 /* Defaults.plist in Resources */,
 				9187259523D63CD1009B63A3 /* README.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -308,6 +322,7 @@
 				9187258C23D63C8A009B63A3 /* DictionaryExtensions.swift in Sources */,
 				918725A123D63ED9009B63A3 /* SplitViewController.swift in Sources */,
 				9187258A23D63C8A009B63A3 /* JWT.swift in Sources */,
+				916E98CB246C348C00287335 /* WanManager.swift in Sources */,
 				9187259023D63C8A009B63A3 /* Auth0ViewController.swift in Sources */,
 				9187258D23D63C8A009B63A3 /* DataExtensions.swift in Sources */,
 				9187258923D63C8A009B63A3 /* JWTDecode.swift in Sources */,
@@ -317,8 +332,9 @@
 				9187259123D63C8A009B63A3 /* RadioPickerViewController.swift in Sources */,
 				9187258523D63C8A009B63A3 /* AppDelegate.swift in Sources */,
 				9187258E23D63C8A009B63A3 /* StringExtensions.swift in Sources */,
-				9187259F23D63ED9009B63A3 /* ViewController.swift in Sources */,
+				9125202224746CFF0024C575 /* ViewController.swift in Sources */,
 				9187258823D63C8A009B63A3 /* Keychain.swift in Sources */,
+				9125201C24745B350024C575 /* RadioManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -447,7 +463,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 0;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = EE5B8TYXGA;
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -460,12 +476,13 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 1.1.7;
+				MARKETING_VERSION = 1.1.8;
 				PRODUCT_BUNDLE_IDENTIFIER = net.k3tzr.xAPITester;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "";
+				VERSION_INFO_PREFIX = v;
 			};
 			name = Debug;
 		};
@@ -478,7 +495,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 0;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = EE5B8TYXGA;
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -491,11 +508,12 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 1.1.7;
+				MARKETING_VERSION = 1.1.8;
 				PRODUCT_BUNDLE_IDENTIFIER = net.k3tzr.xAPITester;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "";
+				VERSION_INFO_PREFIX = v;
 			};
 			name = Release;
 		};
@@ -528,7 +546,7 @@
 			repositoryURL = "https://github.com/K3TZR/xLib6000.git";
 			requirement = {
 				kind = exactVersion;
-				version = 1.2.13;
+				version = 1.3.2;
 			};
 		};
 		917AAA8323D5EDC80082FAEB /* XCRemoteSwiftPackageReference "XCGLogger" */ = {
@@ -544,7 +562,7 @@
 			repositoryURL = "https://github.com/sunshinejr/SwiftyUserDefaults.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 4.0.0;
+				minimumVersion = 5.0.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

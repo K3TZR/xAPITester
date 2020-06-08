@@ -61,24 +61,24 @@ class SplitViewController: NSSplitViewController, ApiDelegate, NSTableViewDelega
   
   internal var _filteredMessages              : [String] {                  // filtered version of textArray
     get {
-      switch MessagesFilters(rawValue: Defaults[.filterByTag]) ?? .none {
+      switch MessagesFilters(rawValue: Defaults.filterByTag) ?? .none {
       
       case .none:       return messages
-      case .prefix:     return messages.filter { $0.contains("|" + Defaults[.filter]) }
-      case .contains:   return messages.filter { $0.contains(Defaults[.filter]) }
-      case .exclude:    return messages.filter { !$0.contains(Defaults[.filter]) }
+      case .prefix:     return messages.filter { $0.contains("|" + Defaults.filter) }
+      case .contains:   return messages.filter { $0.contains(Defaults.filter) }
+      case .exclude:    return messages.filter { !$0.contains(Defaults.filter) }
       case .myHandle:   return messages.filter { $0.dropFirst(9).hasPrefix("S" + myHandle) }
-      case .handle:     return messages.filter { $0.dropFirst(9).hasPrefix("S" + Defaults[.filter]) }
+      case .handle:     return messages.filter { $0.dropFirst(9).hasPrefix("S" + Defaults.filter) }
       }
     }}
   internal var _filteredObjects           : [ObjectTuple] {                  // filtered version of objectsArray
     get {
-      switch ObjectsFilters(rawValue: Defaults[.filterObjectsByTag]) ?? .none {
+      switch ObjectsFilters(rawValue: Defaults.filterObjectsByTag) ?? .none {
       
       case .none:       return objects
-      case .prefix:     return objects.filter { $0.text.dropFirst(9).hasPrefix(Defaults[.filterObjects]) }
-      case .contains:   return objects.filter { $0.text.contains(Defaults[.filterObjects]) }
-      case .exclude:    return objects.filter { !$0.text.contains(Defaults[.filterObjects]) }
+      case .prefix:     return objects.filter { $0.text.dropFirst(9).hasPrefix(Defaults.filterObjects) }
+      case .contains:   return objects.filter { $0.text.contains(Defaults.filterObjects) }
+      case .exclude:    return objects.filter { !$0.text.contains(Defaults.filterObjects) }
       }
     }}
   
@@ -116,7 +116,7 @@ class SplitViewController: NSSplitViewController, ApiDelegate, NSTableViewDelega
     _api.testerDelegate = self
     
     // setup the font
-    _font = NSFont(name: Defaults[.fontName], size: CGFloat(Defaults[.fontSize] ))!
+    _font = NSFont(name: Defaults.fontName, size: CGFloat(Defaults.fontSize ))!
     _tableView.rowHeight = _font.capHeight * 1.7
     
     // setup & start the Objects table timer
@@ -188,18 +188,18 @@ class SplitViewController: NSSplitViewController, ApiDelegate, NSTableViewDelega
   private func fontSize(larger: Bool) {
     
     // limit the font size
-    var newSize =  Defaults[.fontSize] + (larger ? +1 : -1)
+    var newSize =  Defaults.fontSize + (larger ? +1 : -1)
     if larger {
-      if newSize > Defaults[.fontMaxSize] { newSize = Defaults[.fontMaxSize] }
+      if newSize > Defaults.fontMaxSize { newSize = Defaults.fontMaxSize }
     } else {
-      if newSize < Defaults[.fontMinSize] { newSize = Defaults[.fontMinSize] }
+      if newSize < Defaults.fontMinSize { newSize = Defaults.fontMinSize }
     }
     
     // save change to preferences
-    Defaults[.fontSize] = newSize
+    Defaults.fontSize = newSize
     
     // update the font
-    _font = NSFont(name: Defaults[.fontName], size: CGFloat(Defaults[.fontSize] ))!
+    _font = NSFont(name: Defaults.fontName, size: CGFloat(Defaults.fontSize ))!
     _tableView.rowHeight = _font.capHeight * 1.7
     _objectsTableView.rowHeight = _font.capHeight * 1.7
     
@@ -237,7 +237,7 @@ class SplitViewController: NSSplitViewController, ApiDelegate, NSTableViewDelega
     // add the Timestamp to the Text
     let timeInterval = Date().timeIntervalSince(startTimestamp)
     messages.append( String( format: "%8.3f", timeInterval) + " " + text )
-    
+
     reloadTable()
   }
   /// Add text to the Objects table
@@ -285,13 +285,13 @@ class SplitViewController: NSSplitViewController, ApiDelegate, NSTableViewDelega
       //        handler(command, components[0], components[1], (components.count == 3) ? components[2] : "")
       //      }
       // Show all replies?
-      if Defaults[.showAllReplies] {
+      if Defaults.showAllReplies {
         
         // SHOW ALL, is it a ping reply?
         if command == "ping" {
           
           // YES, are pings being shown?
-          if Defaults[.showPings] {
+          if Defaults.showPings {
             
             // YES, show the ping reply
             showInTable("R\(commandSuffix)")
@@ -338,21 +338,22 @@ class SplitViewController: NSSplitViewController, ApiDelegate, NSTableViewDelega
         self.objects.removeAll()
         var color = NSColor.systemGray.withAlphaComponent(0.2)
         
-        self.addObjectsToTable((color, "Radio          name = \(radio.nickname)  model = \(radio.discoveryPacket.model)  ip = \(radio.discoveryPacket.publicIp)" +
+        self.addObjectsToTable((color, "Radio          name = \(radio.nickname)  model = \(radio.packet.model)  ip = \(radio.packet.publicIp)" +
           "  atu = \(Api.sharedInstance.radio!.atuPresent ? "Yes" : "No")  gps = \(Api.sharedInstance.radio!.gpsPresent ? "Yes" : "No")" +
           "  scu's = \(Api.sharedInstance.radio!.numberOfScus)"))
 
         // what verion is the Radio?
         if radio.version.isNewApi {
+                    
           // newApi
-          for (handle, client) in radio.discoveryPacket.guiClients {
+          for (handle, client) in radio.packet.guiClients {
             
             color = objectColors[i]
             
             if self._parent!._stationsPopUp.titleOfSelectedItem == "All" || self._parent!._stationsPopUp.titleOfSelectedItem == client.station {
               activeHandle = handle
               
-              self.addObjectsToTable((color, "Gui Client     station = \(client.station.padTo(15))  handle = \(handle.hex)  id = \(client.clientId ?? "unknown")  localPtt = \(client.isLocalPtt ? "Yes" : "No ")  available = \(radio.discoveryPacket.status.lowercased() == "available" ? "Yes" : "No ")  program = \(client.program)"))
+              self.addObjectsToTable((color, "Gui Client     station = \(client.station.padTo(15))  handle = \(handle.hex)  id = \(client.clientId ?? "unknown")  localPtt = \(client.isLocalPtt ? "Yes" : "No ")  available = \(radio.packet.status.lowercased() == "available" ? "Yes" : "No ")  program = \(client.program)"))
               
               self.addSelectedObjects(activeHandle, radio, color)
             }
@@ -518,7 +519,7 @@ class SplitViewController: NSSplitViewController, ApiDelegate, NSTableViewDelega
     
     if !text.hasSuffix("|ping") { showInTable(text) }
     
-    if text.hasSuffix("|ping") && Defaults[.showPings] { showInTable(text) }
+    if text.hasSuffix("|ping") && Defaults.showPings { showInTable(text) }
   }
   /// Process a received message
   ///
@@ -693,7 +694,7 @@ class SplitViewController: NSSplitViewController, ApiDelegate, NSTableViewDelega
         view.textField!.font = _font
         
         // set the text
-        view.textField!.stringValue = Defaults[.showTimestamps] ? rowText : msgText
+        view.textField!.stringValue = Defaults.showTimestamps ? rowText : msgText
       }
       
     }

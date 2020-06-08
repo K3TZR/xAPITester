@@ -17,38 +17,102 @@ typealias NC = NotificationCenter
 // ----------------------------------------------------------------------------
 // MARK: - Definitions for SwiftyUserDefaults
 
-// defaults keys (for values in defaults.plist)
 extension DefaultsKeys {
   
-  static var auth0Email               : DefaultsKey<String>   { return .init("auth0Email", defaultValue: "") }
-  static var clearAtConnect           : DefaultsKey<Bool>     { return .init("clearAtConnect", defaultValue: false) }
-  static var clearAtDisconnect        : DefaultsKey<Bool>     { return .init("clearAtDisconnect", defaultValue: false) }
-  static var clearOnSend              : DefaultsKey<Bool>     { return .init("clearOnSend", defaultValue: false) }
-  static var clientId                 : DefaultsKey<String?>  { return .init("clientId") }
-  static var defaultRadioSerialNumber : DefaultsKey<String>   { return .init("defaultRadioSerialNumber", defaultValue: "") }
-  static var enablePinging            : DefaultsKey<Bool>     { return .init("enablePinging", defaultValue: false) }
-  static var filter                   : DefaultsKey<String>   { return .init("filter", defaultValue: "") }
-  static var filterByTag              : DefaultsKey<Int>      { return .init("filterByTag", defaultValue: 0) }
-  static var filterMeters             : DefaultsKey<String>   { return .init("filterMeters", defaultValue: "") }
-  static var filterMetersByTag        : DefaultsKey<Int>      { return .init("filterMetersByTag", defaultValue: 0) }
-  static var filterObjects            : DefaultsKey<String>   { return .init("filterObjects", defaultValue: "") }
-  static var filterObjectsByTag       : DefaultsKey<Int>      { return .init("filterObjectsByTag", defaultValue: 0) }
-  static var fontMaxSize              : DefaultsKey<Int>      { return .init("fontMaxSize", defaultValue: 20) }
-  static var fontMinSize              : DefaultsKey<Int>      { return .init("fontMinSize", defaultValue: 8) }
-  static var fontName                 : DefaultsKey<String>   { return .init("fontName", defaultValue: "Monaco") }
-  static var fontSize                 : DefaultsKey<Int>      { return .init("fontSize", defaultValue: 12) }
-  static var isGui                    : DefaultsKey<Bool>     { return .init("isGui", defaultValue: false) }
-  static var lowBandwidthEnabled      : DefaultsKey<Bool>     { return .init("lowBandwidthEnabled", defaultValue: false) }
-  static var showAllReplies           : DefaultsKey<Bool>     { return .init("showAllReplies", defaultValue: false) }
-  static var showPings                : DefaultsKey<Bool>     { return .init("showPings", defaultValue: false) }
-  static var showRemoteTabView        : DefaultsKey<Bool>     { return .init("showRemoteTabView", defaultValue: false) }
-  static var showTimestamps           : DefaultsKey<Bool>     { return .init("showTimestamps", defaultValue: false) }
-  static var smartLinkAuth0Email      : DefaultsKey<String>   { return .init("smartLinkAuth0Email", defaultValue: "") }
-  static var smartLinkToken           : DefaultsKey<String?>  { return .init("smartLinkToken") }
-  static var smartLinkTokenExpiry     : DefaultsKey<Date?>    { return .init("smartLinkTokenExpiry") }
-  static var smartLinkWasLoggedIn     : DefaultsKey<Bool>     { return .init("smartLinkWasLoggedIn", defaultValue: false) }
-  static var suppressUdp              : DefaultsKey<Bool>     { return .init("suppressUdp", defaultValue: false) }
-  static var useLowBw                 : DefaultsKey<Bool>     { return .init("useLowBw", defaultValue: false) }
+  var clearAtConnect           : DefaultsKey<Bool>            { .init("clearAtConnect", defaultValue: false) }
+  var clearAtDisconnect        : DefaultsKey<Bool>            { .init("clearAtDisconnect", defaultValue: false) }
+  var clearOnSend              : DefaultsKey<Bool>            { .init("clearOnSend", defaultValue: false) }
+  var clientId                 : DefaultsKey<String?>         { .init("clientId") }
+  var defaultRadio             : DefaultsKey<String?>         { .init("defaultRadio") }
+  var enablePinging            : DefaultsKey<Bool>            { .init("enablePinging", defaultValue: false) }
+  var filter                   : DefaultsKey<String>          { .init("filter", defaultValue: "") }
+  var filterByTag              : DefaultsKey<Int>             { .init("filterByTag", defaultValue: 0) }
+  var filterMeters             : DefaultsKey<String>          { .init("filterMeters", defaultValue: "") }
+  var filterMetersByTag        : DefaultsKey<Int>             { .init("filterMetersByTag", defaultValue: 0) }
+  var filterObjects            : DefaultsKey<String>          { .init("filterObjects", defaultValue: "") }
+  var filterObjectsByTag       : DefaultsKey<Int>             { .init("filterObjectsByTag", defaultValue: 0) }
+  var fontMaxSize              : DefaultsKey<Int>             { .init("fontMaxSize", defaultValue: 20) }
+  var fontMinSize              : DefaultsKey<Int>             { .init("fontMinSize", defaultValue: 8) }
+  var fontName                 : DefaultsKey<String>          { .init("fontName", defaultValue: "Monaco") }
+  var fontSize                 : DefaultsKey<Int>             { .init("fontSize", defaultValue: 12) }
+  var isGui                    : DefaultsKey<Bool>            { .init("isGui", defaultValue: false) }
+  var lowBandwidthEnabled      : DefaultsKey<Bool>            { .init("lowBandwidthEnabled", defaultValue: false) }
+  var showAllReplies           : DefaultsKey<Bool>            { .init("showAllReplies", defaultValue: false) }
+  var showPings                : DefaultsKey<Bool>            { .init("showPings", defaultValue: false) }
+  var showRemoteTabView        : DefaultsKey<Bool>            { .init("showRemoteTabView", defaultValue: false) }
+  var showTimestamps           : DefaultsKey<Bool>            { .init("showTimestamps", defaultValue: false) }
+  var smartLinkAuth0Email      : DefaultsKey<String?>         { .init("smartLinkAuth0Email") }
+  var smartLinkEnabled         : DefaultsKey<Bool>            { .init("smartLinkEnabled", defaultValue: true) }
+  var smartLinkToken           : DefaultsKey<String?>         { .init("smartLinkToken") }
+  var smartLinkTokenExpiry     : DefaultsKey<Date?>           { .init("smartLinkTokenExpiry") }
+  var smartLinkWasLoggedIn     : DefaultsKey<Bool>            { .init("smartLinkWasLoggedIn", defaultValue: false) }
+  var suppressUdp              : DefaultsKey<Bool>            { .init("suppressUdp", defaultValue: false) }
+  var useLowBw                 : DefaultsKey<Bool>            { .init("useLowBw", defaultValue: false) }
+}
+
+/// Struct to hold a Semantic Version number
+///     with provision for a Build Number
+///
+public struct Version {
+  var major     : Int = 1
+  var minor     : Int = 0
+  var patch     : Int = 0
+  var build     : Int = 1
+
+  public init(_ versionString: String = "1.0.0") {
+    
+    let components = versionString.components(separatedBy: ".")
+    switch components.count {
+    case 3:
+      major = Int(components[0]) ?? 1
+      minor = Int(components[1]) ?? 0
+      patch = Int(components[2]) ?? 0
+      build = 1
+    case 4:
+      major = Int(components[0]) ?? 1
+      minor = Int(components[1]) ?? 0
+      patch = Int(components[2]) ?? 0
+      build = Int(components[3]) ?? 1
+    default:
+      major = 1
+      minor = 0
+      patch = 0
+      build = 1
+    }
+  }
+  
+  public init() {
+    // only useful for Apps & Frameworks (which have a Bundle), not Packages
+    let versions = Bundle.main.infoDictionary!["CFBundleShortVersionString"] as! String
+    let build   = Bundle.main.infoDictionary![kCFBundleVersionKey as String] as! String
+    self.init(versions + ".\(build)")
+   }
+  
+  public var longString       : String  { "\(major).\(minor).\(patch) (\(build))" }
+  public var string           : String  { "\(major).\(minor).\(patch)" }
+
+  public var isV3             : Bool    { major >= 3 }
+  public var isV2NewApi       : Bool    { major == 2 && minor >= 5 }
+  public var isGreaterThanV22 : Bool    { major >= 2 && minor >= 2 }
+  public var isV2             : Bool    { major == 2 && minor < 5 }
+  public var isV1             : Bool    { major == 1 }
+  
+  public var isNewApi         : Bool    { isV3 || isV2NewApi }
+  public var isOldApi         : Bool    { isV1 || isV2 }
+
+  static func ==(lhs: Version, rhs: Version) -> Bool { lhs.major == rhs.major && lhs.minor == rhs.minor && lhs.patch == rhs.patch }
+  
+  static func <(lhs: Version, rhs: Version) -> Bool {
+    
+    switch (lhs, rhs) {
+      
+    case (let l, let r) where l == r: return false
+    case (let l, let r) where l.major < r.major: return true
+    case (let l, let r) where l.major == r.major && l.minor < r.minor: return true
+    case (let l, let r) where l.major == r.major && l.minor == r.minor && l.patch < r.patch: return true
+    default: return false
+    }
+  }
 }
 
 extension URL {
@@ -56,8 +120,8 @@ extension URL {
   /// setup the Support folders
   ///
   static var appSupport : URL { return FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first! }
-  static var logs : URL { return createAsNeeded("Logs") }
-  static var macros : URL { return createAsNeeded("Macros") }
+  static var logs : URL { return createAsNeeded("net.k3tzr.xSDR6000/Logs") }
+  static var macros : URL { return createAsNeeded("net.k3tzr.xSDR6000/Macros") }
   
   static func createAsNeeded(_ folder: String) -> URL {
     let fileManager = FileManager.default
@@ -68,7 +132,7 @@ extension URL {
       
       // NO, create it
       do {
-        try fileManager.createDirectory( at: folderUrl, withIntermediateDirectories: false, attributes: nil)
+        try fileManager.createDirectory( at: folderUrl, withIntermediateDirectories: true, attributes: nil)
       } catch let error as NSError {
         fatalError("Error creating App Support folder: \(error.localizedDescription)")
       }
@@ -121,6 +185,22 @@ extension NSButton {
   var boolState : Bool {
     get { return self.state == NSControl.StateValue.on ? true : false }
     set { self.state = (newValue == true ? NSControl.StateValue.on : NSControl.StateValue.off) }
+  }
+}
+
+extension NSMenuItem {
+  /// Boolean equivalent of an NSMenuItem state property
+  ///
+  var boolState : Bool {
+    get { return self.state == NSControl.StateValue.on ? true : false }
+    set { self.state = (newValue == true ? NSControl.StateValue.on : NSControl.StateValue.off) }
+  }
+}
+
+extension NSMenuItem {
+  
+  func item(title: String) -> NSMenuItem? {
+    self.submenu?.items.first(where: {$0.title == title})
   }
 }
 
