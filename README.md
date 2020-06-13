@@ -74,7 +74,7 @@ If you require a Mac-based Voice Keyer , please see.
 [![W6OP](https://img.shields.io/badge/W6OP-Voice_Keyer-informational)](https://w6op.com)
 
 
-## 1.1.8 Release Notes
+## 1.1.9 Release Notes
 
 * Added "Default Radio NOT found" alert
 * Corrected non-GUI implementation
