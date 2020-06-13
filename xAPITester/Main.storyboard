@@ -228,13 +228,13 @@
                                         <menuItem title="Copy to Clipboard" keyEquivalent="c" id="S13-0C-5Ar">
                                             <modifierMask key="keyEquivalentModifierMask" control="YES" command="YES"/>
                                             <connections>
-                                                <action selector="copyToClipboard:" target="Ady-hI-5gd" id="EaE-nm-ZXC"/>
+                                                <action selector="copyToClipboardButton:" target="Ady-hI-5gd" id="EaE-nm-ZXC"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem title="Copy to Cmd" keyEquivalent="c" id="x3v-GG-iWU">
                                             <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
                                             <connections>
-                                                <action selector="copyToCmd:" target="Ady-hI-5gd" id="DZq-AF-QuJ"/>
+                                                <action selector="copyToCmdButton:" target="Ady-hI-5gd" id="DZq-AF-QuJ"/>
                                             </connections>
                                         </menuItem>
                                     </items>
@@ -569,7 +569,7 @@
                 <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="xAPITester" customModuleProvider="target"/>
                 <customObject id="Ady-hI-5gd" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="75" y="0.0"/>
+            <point key="canvasLocation" x="462" y="-479"/>
         </scene>
         <!--Window Controller-->
         <scene sceneID="R2V-B0-nI4">
@@ -590,7 +590,7 @@
                 </windowController>
                 <customObject id="Oky-zY-oP4" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="291" y="414"/>
+            <point key="canvasLocation" x="84" y="395"/>
         </scene>
         <!--View Controller-->
         <scene sceneID="hIz-AP-VOD">
@@ -607,7 +607,7 @@
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
                                 <connections>
-                                    <action selector="send:" target="XfG-lQ-9wD" id="6hL-8H-hPV"/>
+                                    <action selector="sendButton:" target="XfG-lQ-9wD" id="6hL-8H-hPV"/>
                                 </connections>
                             </button>
                             <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Ubx-d9-73G">
@@ -678,7 +678,7 @@
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
                                 <connections>
-                                    <action selector="connect:" target="XfG-lQ-9wD" id="Xcs-oB-rq4"/>
+                                    <action selector="connectButton:" target="XfG-lQ-9wD" id="Xcs-oB-rq4"/>
                                 </connections>
                             </button>
                             <button translatesAutoresizingMaskIntoConstraints="NO" id="ivv-Oe-yQT">
@@ -688,7 +688,7 @@
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
                                 <connections>
-                                    <action selector="connectAsGui:" target="XfG-lQ-9wD" id="K2e-V7-AkW"/>
+                                    <action selector="connectAsGuiCheckbox:" target="XfG-lQ-9wD" id="K2e-V7-AkW"/>
                                     <binding destination="TYT-Zn-7lZ" name="value" keyPath="values.isGui" id="PZH-5a-aGc"/>
                                 </connections>
                             </button>
@@ -702,7 +702,7 @@
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
                                 <connections>
-                                    <action selector="showTimestamps:" target="XfG-lQ-9wD" id="YgQ-7W-c6P"/>
+                                    <action selector="showTimestampsCheckbox:" target="XfG-lQ-9wD" id="YgQ-7W-c6P"/>
                                     <binding destination="TYT-Zn-7lZ" name="value" keyPath="values.showTimestamps" id="uto-83-cEz"/>
                                 </connections>
                             </button>
@@ -765,7 +765,7 @@
                                                 </menu>
                                             </popUpButtonCell>
                                             <connections>
-                                                <action selector="updateFilterBy:" target="XfG-lQ-9wD" id="Lkv-Oy-fwf"/>
+                                                <action selector="filterByPopUp:" target="XfG-lQ-9wD" id="Lkv-Oy-fwf"/>
                                                 <binding destination="TYT-Zn-7lZ" name="selectedTag" keyPath="values.filterByTag" id="qds-dF-iGZ"/>
                                             </connections>
                                         </popUpButton>
@@ -780,7 +780,7 @@
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                             <connections>
-                                                <action selector="updateFilter:" target="XfG-lQ-9wD" id="L76-Mn-MSX"/>
+                                                <action selector="updateFilterTextField:" target="XfG-lQ-9wD" id="L76-Mn-MSX"/>
                                                 <binding destination="TYT-Zn-7lZ" name="value" keyPath="values.filter" id="TIh-eq-JgB"/>
                                             </connections>
                                         </textField>
@@ -806,7 +806,7 @@
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
                                 <connections>
-                                    <action selector="send:" target="XfG-lQ-9wD" id="oc9-uK-7E4"/>
+                                    <action selector="sendButton:" target="XfG-lQ-9wD" id="oc9-uK-7E4"/>
                                 </connections>
                             </button>
                             <box autoresizesSubviews="NO" borderType="line" title="Objects" translatesAutoresizingMaskIntoConstraints="NO" id="c72-AN-7lv">
@@ -845,7 +845,7 @@
                                                 </menu>
                                             </popUpButtonCell>
                                             <connections>
-                                                <action selector="updateFilterObjectsBy:" target="XfG-lQ-9wD" id="TXZ-ig-QRE"/>
+                                                <action selector="filterObjectsByPopUp:" target="XfG-lQ-9wD" id="TXZ-ig-QRE"/>
                                                 <binding destination="TYT-Zn-7lZ" name="selectedTag" keyPath="values.filterObjectsByTag" id="v8s-cB-db3"/>
                                             </connections>
                                         </popUpButton>
@@ -860,7 +860,7 @@
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                             <connections>
-                                                <action selector="updateFilterObjects:" target="XfG-lQ-9wD" id="Ubd-0w-Wwg"/>
+                                                <action selector="filterObjectsPopUp:" target="XfG-lQ-9wD" id="Ubd-0w-Wwg"/>
                                                 <binding destination="TYT-Zn-7lZ" name="value" keyPath="values.filterObjects" id="Tdk-L4-DCt"/>
                                             </connections>
                                         </textField>
@@ -895,7 +895,7 @@
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
-                                                <action selector="runMacro:" target="XfG-lQ-9wD" id="Gve-pW-Mtl"/>
+                                                <action selector="runMacroButton:" target="XfG-lQ-9wD" id="Gve-pW-Mtl"/>
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="RE2-Ie-3BE">
@@ -906,7 +906,7 @@
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
-                                                <action selector="saveMacro:" target="XfG-lQ-9wD" id="NMe-wi-CZb"/>
+                                                <action selector="saveMacroButton:" target="XfG-lQ-9wD" id="NMe-wi-CZb"/>
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nmT-gX-hYj">
@@ -917,7 +917,7 @@
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
-                                                <action selector="loadMacro:" target="XfG-lQ-9wD" id="Jas-ci-iQq"/>
+                                                <action selector="loadMacroButton:" target="XfG-lQ-9wD" id="Jas-ci-iQq"/>
                                             </connections>
                                         </button>
                                     </subviews>
@@ -941,7 +941,7 @@
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
-                                                <action selector="clear:" target="XfG-lQ-9wD" id="J6M-Bo-7bw"/>
+                                                <action selector="clearButton:" target="XfG-lQ-9wD" id="J6M-Bo-7bw"/>
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Frx-GF-8ZI">
@@ -952,7 +952,7 @@
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
-                                                <action selector="copyToClipboard:" target="XfG-lQ-9wD" id="n6q-9T-gh2"/>
+                                                <action selector="copyToClipboardButton:" target="XfG-lQ-9wD" id="n6q-9T-gh2"/>
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3Oq-cb-V2v">
@@ -963,7 +963,7 @@
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
-                                                <action selector="copyToCmd:" target="XfG-lQ-9wD" id="bDz-mQ-evm"/>
+                                                <action selector="copyToCmdButton:" target="XfG-lQ-9wD" id="bDz-mQ-evm"/>
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="PKz-kx-BAD">
@@ -974,7 +974,7 @@
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
-                                                <action selector="copyHandle:" target="XfG-lQ-9wD" id="6ta-Jm-qOc"/>
+                                                <action selector="copyHandleButton:" target="XfG-lQ-9wD" id="6ta-Jm-qOc"/>
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fzE-O3-gSf">
@@ -985,7 +985,7 @@
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
-                                                <action selector="save:" target="XfG-lQ-9wD" id="V2R-JR-wA4"/>
+                                                <action selector="saveButton:" target="XfG-lQ-9wD" id="V2R-JR-wA4"/>
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="VAE-vh-pAl">
@@ -996,7 +996,7 @@
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
-                                                <action selector="load:" target="XfG-lQ-9wD" id="nlp-kX-5M2"/>
+                                                <action selector="loadButton:" target="XfG-lQ-9wD" id="nlp-kX-5M2"/>
                                             </connections>
                                         </button>
                                     </subviews>
@@ -1023,7 +1023,7 @@
                                     </menu>
                                 </popUpButtonCell>
                                 <connections>
-                                    <action selector="updateShowStations:" target="XfG-lQ-9wD" id="CuL-vC-D78"/>
+                                    <action selector="showStationsPopUp:" target="XfG-lQ-9wD" id="CuL-vC-D78"/>
                                 </connections>
                             </popUpButton>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="O8a-FG-ek4">
@@ -1067,7 +1067,7 @@
                                     </menu>
                                 </popUpButtonCell>
                                 <connections>
-                                    <action selector="updateBinding:" target="XfG-lQ-9wD" id="LCW-WE-zNH"/>
+                                    <action selector="bindingPopUp:" target="XfG-lQ-9wD" id="LCW-WE-zNH"/>
                                 </connections>
                             </popUpButton>
                             <button translatesAutoresizingMaskIntoConstraints="NO" id="mGs-0h-tju">
@@ -1180,7 +1180,7 @@
                 <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <userDefaultsController representsSharedInstance="YES" id="TYT-Zn-7lZ"/>
             </objects>
-            <point key="canvasLocation" x="292" y="1186.5"/>
+            <point key="canvasLocation" x="1146" y="386"/>
         </scene>
         <!--Help-->
         <scene sceneID="hlC-Ag-LLL">
@@ -1193,7 +1193,7 @@
                 </viewController>
                 <customObject id="Vsh-qF-uYp" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1208" y="27"/>
+            <point key="canvasLocation" x="834" y="-169"/>
         </scene>
         <!--Meters-->
         <scene sceneID="6PS-nx-QVr">
@@ -1639,7 +1639,7 @@
                 <customObject id="sEL-1s-W0c" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <userDefaultsController id="2Zk-09-reC"/>
             </objects>
-            <point key="canvasLocation" x="1444" y="-456"/>
+            <point key="canvasLocation" x="80" y="-177"/>
         </scene>
         <!--Split View Controller-->
         <scene sceneID="XVh-vR-xYr">
@@ -1804,7 +1804,7 @@
                 </viewController>
                 <customObject id="CjW-A1-XRh" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="295" y="1824"/>
+            <point key="canvasLocation" x="1146" y="1068"/>
         </scene>
     </scenes>
     <resources>

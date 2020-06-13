@@ -36,8 +36,8 @@ Flex Radios can have one of four different version groups:
 *  v1.x.x, the v1 API - untested at this time
 *  v2.0.x thru v2.4.9, the v2 API <<-- CURRENTLY SUPPORTED
 *  v2.5.1 to less than v3.0.0, the v3 API without MultiFlex <<-- CURRENTLY SUPPORTED
-*  v3.0.0 thru v3.1.11, the v3 API with MultiFlex <<-- CURRENTLY SUPPORTED
-*  greater than v3.1.11 - untested at this time
+*  v3.0.0 thru v3.1.12, the v3 API with MultiFlex <<-- CURRENTLY SUPPORTED
+*  greater than v3.1.12 - untested at this time
 
 
 ## Credits
@@ -72,6 +72,14 @@ If you require a Mac-based Voice Keyer , please see.
 (works with xSDR6000 on macOS or SmartSDR on Windows)
 
 [![W6OP](https://img.shields.io/badge/W6OP-Voice_Keyer-informational)](https://w6op.com)
+
+
+## 1.1.8 Release Notes
+
+* Added "Default Radio NOT found" alert
+* Corrected non-GUI implementation
+* Corrected delegate type in RadioPicker
+* Reorganized / renamed Action methods in ViewController
 
 
 ## 1.1.8 Release Notes

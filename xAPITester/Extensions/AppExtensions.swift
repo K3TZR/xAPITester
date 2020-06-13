@@ -258,6 +258,84 @@ extension String {
 // ----------------------------------------------------------------------------
 // MARK: - TOP-LEVEL FUNCTIONS
 
+/// Repeatedly perform a condition func until satisfied or a timeout
+/// - Parameters:
+///   - interval:           how offten to check the condition func (seconds)
+///   - wait:               how long until timeout (seconds)
+///   - condition:          a condition func ()->Bool
+///   - completionHandler:  a completion handler (wasCancelled)->()
+///
+func checkLoop(interval: Int, wait: TimeInterval, condition: @escaping ()->Bool, completionHandler: @escaping (Bool)->()) {
+  
+  // create the timer
+  let start = Date()
+  let timer = DispatchSource.makeTimerSource()
+  
+  timer.schedule(deadline: DispatchTime.now(), repeating: .seconds(interval))
+  timer.setEventHandler{
+    // timeout after "wait" seconds
+    if Date(timeIntervalSinceNow:0).timeIntervalSince(start) > wait {
+      // time out
+      timer.cancel()
+      completionHandler(false)
+    } else {
+      // not time out, check condition
+      if condition() {
+        timer.cancel()
+        completionHandler(true)
+      }
+    }
+  }
+  // start the timer
+  timer.resume()
+}
+
+/// Display an Alert sheet for a limited time or until some condition is met (whichever comes first)
+/// - Parameters:
+///   - message:            the message to display
+///   - window:             the window for the sheet
+///   - interval:           how offten to check the condition func (seconds)
+///   - wait:               how long until timeout (seconds)
+///   - condition:          a condition func ()->Bool
+///   - completionHandler:  a completion handler (wasCancelled)->()
+///
+func waitAlert(message: String, window: NSWindow, interval: Int, wait: TimeInterval, condition: @escaping ()->Bool, completionHandler: @escaping (Bool)->()) {
+
+  // create the timer
+  let start = Date()
+  let timer = DispatchSource.makeTimerSource()
+  let alert = NSAlert()
+
+  timer.schedule(deadline: DispatchTime.now(), repeating: .seconds(interval))
+  timer.setEventHandler{
+   // timeout after "wait" seconds
+    if Date(timeIntervalSinceNow:0).timeIntervalSince(start) > wait {
+      // time out
+      timer.cancel()
+      completionHandler(false)
+      DispatchQueue.main.async {
+        window.endSheet(alert.window)
+      }
+    } else {
+      // not time out, check condition
+      if condition() {
+        timer.cancel()
+        completionHandler(true)
+        DispatchQueue.main.async {
+          window.endSheet(alert.window)
+        }
+      }
+    }
+  }
+  alert.messageText = message
+  alert.alertStyle = .informational
+  alert.addButton(withTitle: "Cancel")
+  alert.beginSheetModal(for: window, completionHandler: { (response) in
+    if response == NSApplication.ModalResponse.alertFirstButtonReturn { timer.cancel() ; completionHandler(false) }
+  })
+  // start the timer
+  timer.resume()
+}
 /// Find versions for this app and the specified framework
 ///
 func versionInfo(framework: String) -> (String, String) {

@@ -162,11 +162,7 @@ public final class ViewController: NSViewController, NSTextFieldDelegate, WanMan
   // ----------------------------------------------------------------------------
   // MARK: - Action methods
   
-  /// Respond to the Clear button (in the Commands & Replies box)
-  ///
-  /// - Parameter sender:     the button
-  ///
-  @IBAction func clear(_ sender: NSButton) {
+  @IBAction func clearButton(_ sender: NSButton) {
     
     // clear all previous commands & replies
     _splitViewVC?.messages.removeAll()
@@ -176,18 +172,20 @@ public final class ViewController: NSViewController, NSTextFieldDelegate, WanMan
     _splitViewVC?.objects.removeAll()
     _splitViewVC?.reloadObjectsTable()
   }
-  /// Respond to the Connect button
-  ///
-  /// - Parameter sender:     the button
-  ///
-  @IBAction func connect(_ sender: NSButton) {
+
+  @IBAction func connectAsGuiCheckbox(_ sender: NSButton) {
+    
+    Defaults.isGui = sender.boolState
+  }
+
+  @IBAction func connectButton(_ sender: NSButton) {
     
     // Connect or Disconnect?
     switch sender.title {
       
     case "Connect":
       // open the Default Radio (if any), otherwise open the Picker
-      findDefault(Defaults.defaultRadio)
+      findDefault()
       
     case "Disconnect":
       if let packet = _api.radio?.packet {
@@ -201,41 +199,8 @@ public final class ViewController: NSViewController, NSTextFieldDelegate, WanMan
       break
     }
   }
-  /// The Connect as Gui checkbox changed
-  ///
-  /// - Parameter sender:     the checkbox
-  ///
-  @IBAction func connectAsGui(_ sender: NSButton) {
-    
-    Defaults.isGui = sender.boolState
-  }
-  /// Respond to the Copy button (in the Commands & Replies box)
-  ///
-  /// - Parameter sender:     any Object
-  ///
-  @IBAction func copyToClipboard(_ sender: Any){
-    
-    // if no rows selected, select all
-    if _splitViewVC!._tableView.numberOfSelectedRows == 0 { _splitViewVC!._tableView.selectAll(self) }
-    
-    let pasteBoard = NSPasteboard.general
-    pasteBoard.clearContents()
-    pasteBoard.setString( copyRows(_splitViewVC!._tableView, from: _splitViewVC!._filteredMessages), forType: NSPasteboard.PasteboardType.string )
-  }
-  /// Respond to the Copy to Cmd button (in the Commands & Replies box)
-  ///
-  /// - Parameter sender:     any object
-  ///
-  @IBAction func copyToCmd(_ sender: Any) {
-    
-    // paste the text into the command line
-    _command.stringValue = copyRows(_splitViewVC!._tableView, from: _splitViewVC!._filteredMessages, stopOnFirst: true)
-  }
-  /// Respond to the Copy Handle button
-  ///
-  /// - Parameter sender:     the button
-  ///
-  @IBAction func copyHandle(_ sender: Any) {
+
+  @IBAction func copyHandleButton(_ sender: Any) {
     var textToCopy = ""
     
     // get the indexes of the selected rows
@@ -254,11 +219,76 @@ public final class ViewController: NSViewController, NSTextFieldDelegate, WanMan
     // paste the text into the filter
     Defaults.filter = textToCopy
   }
-  /// Respond to the Load button (in the Commands & Replies box)
+
+  @IBAction func copyToClipboardButton(_ sender: Any){
+    
+    // if no rows selected, select all
+    if _splitViewVC!._tableView.numberOfSelectedRows == 0 { _splitViewVC!._tableView.selectAll(self) }
+    
+    let pasteBoard = NSPasteboard.general
+    pasteBoard.clearContents()
+    pasteBoard.setString( copyRows(_splitViewVC!._tableView, from: _splitViewVC!._filteredMessages), forType: NSPasteboard.PasteboardType.string )
+  }
+
+  @IBAction func copyToCmdButton(_ sender: Any) {
+    
+    // paste the text into the command line
+    _command.stringValue = copyRows(_splitViewVC!._tableView, from: _splitViewVC!._filteredMessages, stopOnFirst: true)
+  }
+  /// Open the Radio Picker as a sheet
   ///
-  /// - Parameter sender:     the button
-  ///
-  @IBAction func load(_ sender: NSButton) {
+  func openRadioPicker() {
+    let radioPickerStoryboard = NSStoryboard(name: "RadioPicker", bundle: nil)
+    _radioPickerViewController = radioPickerStoryboard.instantiateController(withIdentifier: "RadioPicker") as? RadioPickerViewController
+    _radioPickerViewController!.delegate = self
+    
+    DispatchQueue.main.async { [unowned self] in
+      // show the RadioPicker sheet
+      self.presentAsSheet(self._radioPickerViewController!)
+    }
+  }
+
+  @IBAction func runMacroButton(_ sender: NSButton) {
+
+    _macros.runMacro("", window: view.window!, appFolderUrl: _appFolderUrl)
+  }
+  
+  @IBAction func bindingPopUp(_ sender: NSPopUpButton) {
+    
+    // if a valid handle, bind to it
+    if sender.titleOfSelectedItem == "None" {
+      _api.radio?.boundClientId = ""
+
+    } else {
+      _api.radio?.boundClientId = sender.selectedItem?.toolTip
+    }
+  }
+
+  @IBAction func filterByPopUp(_ sender: NSPopUpButton) {
+    
+    // clear the Filter string field
+    Defaults.filter = ""
+    
+    // force a redraw
+    _splitViewVC?.reloadTable()
+  }
+
+  @IBAction func filterObjectsPopUp(_ sender: NSTextField) {
+    
+    // force a redraw
+    _splitViewVC?.reloadObjectsTable()
+  }
+
+  @IBAction func filterObjectsByPopUp(_ sender: NSPopUpButton) {
+    
+    // clear the Filter string field
+    Defaults.filterObjects = ""
+    
+    // force a redraw
+    _splitViewVC?.reloadObjectsTable()
+  }
+
+  @IBAction func loadButton(_ sender: NSButton) {
     
     let openPanel = NSOpenPanel()
     openPanel.allowedFileTypes = [kCommandsRepliesFileExt]
@@ -294,11 +324,8 @@ public final class ViewController: NSViewController, NSTextFieldDelegate, WanMan
       }
     }
   }
-  /// Respond to the Load button (in the Macros box)
-  ///
-  /// - Parameter sender:     the button
-  ///
-  @IBAction func loadMacro(_ sender: NSButton) {
+
+  @IBAction func loadMacroButton(_ sender: NSButton) {
     
     let openPanel = NSOpenPanel()
     openPanel.allowedFileTypes = [kMacroFileExt]
@@ -335,31 +362,12 @@ public final class ViewController: NSViewController, NSTextFieldDelegate, WanMan
       }
     }
   }
-  /// Open the Radio Picker as a sheet
-  ///
-  func openRadioPicker() {
-    let radioPickerStoryboard = NSStoryboard(name: "RadioPicker", bundle: nil)
-    _radioPickerViewController = radioPickerStoryboard.instantiateController(withIdentifier: "RadioPicker") as? RadioPickerViewController
-    _radioPickerViewController!.delegate = self
-    
-    DispatchQueue.main.async { [unowned self] in
-      // show the RadioPicker sheet
-      self.presentAsSheet(self._radioPickerViewController!)
-    }
-  }
-  /// Respond to the Run button (in the Macros box)
-  ///
-  /// - Parameter sender:     the button
-  ///
-  @IBAction func runMacro(_ sender: NSButton) {
 
-    _macros.runMacro("", window: view.window!, appFolderUrl: _appFolderUrl)
+  @IBAction func radioSelectionMenu(_ sender: NSMenuItem) {
+    openRadioPicker()
   }
-  /// Respond to the Save button (in the Commands & Replies box)
-  ///
-  /// - Parameter sender:     the button
-  ///
-  @IBAction func save(_ sender: NSButton) {
+
+  @IBAction func saveButton(_ sender: NSButton) {
     
     let savePanel = NSSavePanel()
     savePanel.allowedFileTypes = [kCommandsRepliesFileExt]
@@ -379,11 +387,8 @@ public final class ViewController: NSViewController, NSTextFieldDelegate, WanMan
       }
     }
   }
-  /// Respond to the Save button (in the Macros box)
-  ///
-  /// - Parameter sender:     the button
-  ///
-  @IBAction func saveMacro(_ sender: NSButton) {
+
+  @IBAction func saveMacroButton(_ sender: NSButton) {
 
     let savePanel = NSSavePanel()
     savePanel.allowedFileTypes = [kMacroFileExt]
@@ -404,11 +409,8 @@ public final class ViewController: NSViewController, NSTextFieldDelegate, WanMan
     }
 
   }
-  /// Respond to the Send button
-  ///
-  /// - Parameter sender:     the button
-  ///
-  @IBAction func send(_ sender: NSButton) {
+
+  @IBAction func sendButton(_ sender: NSButton) {
     
     // get the command
     let cmd = _command.stringValue
@@ -453,21 +455,25 @@ public final class ViewController: NSViewController, NSTextFieldDelegate, WanMan
       }
     }
   }
-  /// Respond to the Show Timestamps checkbox
-  ///
-  /// - Parameter sender:   the button
-  ///
-  @IBAction func showTimestamps(_ sender: NSButton) {
+  
+  @IBAction func showStationsPopUp(_ sender: NSPopUpButton) {
+    
+    if sender.titleOfSelectedItem == "All" {
+      _splitViewVC!.selectedStation = nil
+    } else {
+      _splitViewVC!.selectedStation = sender.titleOfSelectedItem
+    }
+    // force a redraw
+    _splitViewVC?.reloadTable()
+  }
+
+  @IBAction func showTimestampsCheckbox(_ sender: NSButton) {
     
     // force a redraw
     _splitViewVC?.reloadTable()
     _splitViewVC?.reloadObjectsTable()
   }
 
-  @IBAction func radioSelectionMenu(_ sender: NSMenuItem) {
-    openRadioPicker()
-  }
-  
   @IBAction func smartLinkMenu(_ sender: NSMenuItem) {
     
     sender.boolState.toggle()
@@ -481,10 +487,7 @@ public final class ViewController: NSViewController, NSTextFieldDelegate, WanMan
       _radioManager?.smartLinkLogin()
     }
   }
-  /// Respond to the Close menu item
-  ///
-  /// - Parameter sender:     the button
-  ///
+
   @IBAction func terminate(_ sender: AnyObject) {
     
     // disconnect the active radio
@@ -492,122 +495,45 @@ public final class ViewController: NSViewController, NSTextFieldDelegate, WanMan
     
     NSApp.terminate(self)
   }
-  /// The Filter text field changed (in the Commands & Replies box)
-  ///
-  /// - Parameter sender:     the text field
-  ///
-  @IBAction func updateFilter(_ sender: NSTextField) {
-    
-    // force a redraw
-    _splitViewVC?.reloadTable()
-  }
-  /// The ShowHandles PopUp changed
-  ///
-  /// - Parameter sender:     the popup
-  ///
-  @IBAction func updateShowStations(_ sender: NSPopUpButton) {
-    
-    if sender.titleOfSelectedItem == "All" {
-      _splitViewVC!.selectedStation = nil
-    } else {
-      _splitViewVC!.selectedStation = sender.titleOfSelectedItem
-    }
-    // force a redraw
-    _splitViewVC?.reloadTable()
-  }
-  @IBAction func updateBinding(_ sender: NSPopUpButton) {
-    
-    // if a valid handle, bind to it
-    if sender.titleOfSelectedItem == "None" {
-      _api.radio?.boundClientId = ""
 
-    } else {
-      _api.radio?.boundClientId = sender.selectedItem?.toolTip
-    }
-  }
-  /// The FilterBy PopUp changed (in the Commands & Replies box)
-  ///
-  /// - Parameter sender:     the popup
-  ///
-  @IBAction func updateFilterBy(_ sender: NSPopUpButton) {
-    
-    // clear the Filter string field
-    Defaults.filter = ""
+  @IBAction func updateFilterTextField(_ sender: NSTextField) {
     
     // force a redraw
     _splitViewVC?.reloadTable()
   }
-  /// The Filter text field changed (in the Objects box)
-  ///
-  /// - Parameter sender:     the text field
-  ///
-  @IBAction func updateFilterObjects(_ sender: NSTextField) {
-    
-    // force a redraw
-    _splitViewVC?.reloadObjectsTable()
-  }
-  /// The FilterBy PopUp changed (in the Objects box)
-  ///
-  /// - Parameter sender:     the popup
-  ///
-  @IBAction func updateFilterObjectsBy(_ sender: NSPopUpButton) {
-    
-    // clear the Filter string field
-    Defaults.filterObjects = ""
-    
-    // force a redraw
-    _splitViewVC?.reloadObjectsTable()
-  }
-  
+
   // ----------------------------------------------------------------------------
   // MARK: - Private methods
 
   /// Find and Open the Default Radio (if any) else the Radio Picker
   ///
-  /// - Parameter defaultRadio:   a String of the form <wan|local>.<serialNumber>
-  ///
-  private func findDefault( _ defaultRadio: String?) {
-    // embedded func to close sheet
-    func closeSheet(_ packet: DiscoveryPacket?) {
-      view.window!.endSheet(_pleaseWait.window)
-      if let packet = packet {
-        openSelectedRadio(packet)
-      } else {
-        openRadioPicker()
-      }
-    }
-    // is there a default?
-    if defaultRadio != nil {
-      // YES, create & show the "Please Wait" sheet
-      _pleaseWait = NSAlert()
-      _pleaseWait.messageText = ""
-      _pleaseWait.informativeText = "Searching for the Default Radio"
-      _pleaseWait.alertStyle = .informational
-      _pleaseWait.addButton(withTitle: "Cancel")
-      // Open the sheet (closes on Cancel, timeout or default found)
-      _pleaseWait.beginSheetModal(for: view.window!, completionHandler: { (response) in
-        if response == NSApplication.ModalResponse.alertFirstButtonReturn { self.openRadioPicker() }
-      })
-      // try to find the default radio
-      DispatchQueue.main.async {
-        let start = DispatchTime.now()
-        var packet : DiscoveryPacket?
-        while DispatchTime.now() < start + .seconds(ViewController.kSearchTime) {
-          // has the default Radio been found?
-          packet = Discovery.sharedInstance.defaultFound( Defaults.defaultRadio )
-          if packet != nil {
-            self._log("Default radio found, \(packet!.nickname) @ \(packet!.publicIp), serial \(packet!.serialNumber), isWan = \(packet!.isWan)", .info, #function, #file, #line)
-            break
-          } else {
-            usleep(ViewController.kSearchIncrements)
+  private func findDefault() {
+    
+    if Defaults.defaultRadio == nil {
+      openRadioPicker()
+    
+    } else {
+      checkLoop(interval: 1, wait: 4, condition: checkForDefault, completionHandler: { defaultFound in
+        if defaultFound {
+          self.openSelectedRadio(Discovery.sharedInstance.defaultFound( Defaults.defaultRadio )!)
+        } else {
+          DispatchQueue.main.async {
+            let alert = NSAlert()
+            alert.messageText = "Default Radio NOT found"
+            alert.alertStyle = .warning
+            alert.beginSheetModal(for: self.view.window!, completionHandler: { (response) in
+              self.openRadioPicker()
+            })
           }
         }
-        closeSheet(packet)
-      }
-    } else {
-      // NO Default
-      openRadioPicker()
+      })
     }
+  }
+  /// Check if the default radio is in DiscoveredRadios
+  /// - Returns: found / NOT found
+  ///
+  private func checkForDefault() -> Bool {
+    return Discovery.sharedInstance.defaultFound( Defaults.defaultRadio ) != nil
   }
   /// Open the specified Radio
   /// - Parameter discoveryPacket: a DiscoveryPacket
@@ -627,14 +553,14 @@ public final class ViewController: NSViewController, NSTextFieldDelegate, WanMan
     switch (isNewApi, status, guiCount) {
       
     case (false, kAvailable, _):          // oldApi, not connected to another client
-      _ = _radioManager.connectRadio(packet) ; updateButtonStates()
+      _ = _radioManager.connectRadio(packet, isGui: Defaults.isGui) ; updateButtonStates()
       
     case (false, kInUse, _):              // oldApi, connected to another client
       DispatchQueue.main.async {
         let alert = NSAlert()
         alert.alertStyle = .warning
         alert.messageText = "Radio is connected to another Client"
-        alert.informativeText = "Close the Client?"
+        alert.informativeText = "Close the Client"
         alert.addButton(withTitle: "Close current client")
         alert.addButton(withTitle: "Cancel")
         
@@ -644,34 +570,29 @@ public final class ViewController: NSViewController, NSTextFieldDelegate, WanMan
           
           switch response {
           case NSApplication.ModalResponse.alertFirstButtonReturn:
-            _ = self._radioManager.connectRadio(packet, pendingDisconnect: .oldApi) ; self.updateButtonStates()
+            _ = self._radioManager.connectRadio(packet, isGui: Defaults.isGui, pendingDisconnect: .oldApi) ; self.updateButtonStates()
             sleep(1)
             self._api.disconnect()
             sleep(1)
             self.openRadioPicker()
-            
+
           default:  break
           }
           
         })}
       
     case (true, kAvailable, 0):           // newApi, not connected to another client
-      _ = _radioManager.connectRadio(packet) ; self.updateButtonStates()
+      _ = _radioManager.connectRadio(packet, isGui: Defaults.isGui) ; self.updateButtonStates()
       
     case (true, kAvailable, _):           // newApi, connected to another client
       DispatchQueue.main.async {
         let alert = NSAlert()
         alert.alertStyle = .warning
         alert.messageText = "Radio is connected to Station: \(clients[0].station)"
-        alert.informativeText = "Close the Station . . Or . . Connect using Multiflex . . Or . . use Remote Control"
+        alert.informativeText = "Close the Station . . Or . . Make an additional connection"
         alert.addButton(withTitle: "Close \(clients[0].station)")
-        alert.addButton(withTitle: "Multiflex Connect")
-        alert.addButton(withTitle: "Remote Control")
+        alert.addButton(withTitle: "Additional Connect")
         alert.addButton(withTitle: "Cancel")
-        
-        // FIXME: Remote Control implementation needed
-        
-        alert.buttons[2].isEnabled = false
         
         // ignore if not confirmed by the user
         alert.beginSheetModal(for: NSApplication.shared.mainWindow!, completionHandler: { (response) in
@@ -679,9 +600,9 @@ public final class ViewController: NSViewController, NSTextFieldDelegate, WanMan
           
           switch response {
           case NSApplication.ModalResponse.alertFirstButtonReturn:
-            _ = self._radioManager.connectRadio(packet, pendingDisconnect: .newApi(handle: handles[0])) ; self.updateButtonStates()
+            _ = self._radioManager.connectRadio(packet, isGui: Defaults.isGui, pendingDisconnect: .newApi(handle: handles[0])) ; self.updateButtonStates()
           case NSApplication.ModalResponse.alertSecondButtonReturn:
-            _ = self._radioManager.connectRadio(packet)  ; self.updateButtonStates()
+            _ = self._radioManager.connectRadio(packet, isGui: Defaults.isGui )  ; self.updateButtonStates()
           default:  break
           }
         })}
@@ -694,21 +615,21 @@ public final class ViewController: NSViewController, NSTextFieldDelegate, WanMan
         alert.informativeText = "Close one of the Stations . . Or . . use Remote Control"
         alert.addButton(withTitle: "Close \(clients[0].station)")
         alert.addButton(withTitle: "Close \(clients[1].station)")
-        alert.addButton(withTitle: "Remote Control")
+        alert.addButton(withTitle: "Remote Control (Non-Gui)")
         alert.addButton(withTitle: "Cancel")
         
-        // FIXME: Remote Control implementation needed
-        
-        alert.buttons[2].isEnabled = false
+        alert.buttons[2].isEnabled = !Defaults.isGui
         
         // ignore if not confirmed by the user
         alert.beginSheetModal(for: NSApplication.shared.mainWindow!, completionHandler: { (response) in
           
           switch response {
           case NSApplication.ModalResponse.alertFirstButtonReturn:
-           _ =  self._radioManager.connectRadio(packet, pendingDisconnect: .newApi(handle: handles[0]))  ; self.updateButtonStates()
+            _ =  self._radioManager.connectRadio(packet, isGui: Defaults.isGui, pendingDisconnect: .newApi(handle: handles[0]))  ; self.updateButtonStates()
           case NSApplication.ModalResponse.alertSecondButtonReturn:
-            _ = self._radioManager.connectRadio(packet, pendingDisconnect: .newApi(handle: handles[1]))  ; self.updateButtonStates()
+            _ = self._radioManager.connectRadio(packet, isGui: Defaults.isGui, pendingDisconnect: .newApi(handle: handles[1]))  ; self.updateButtonStates()
+          case NSApplication.ModalResponse.alertThirdButtonReturn:
+            _ = self._radioManager.connectRadio(packet, isGui: false)  ; self.updateButtonStates()
           default:  break
           }
         })}

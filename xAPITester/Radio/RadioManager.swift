@@ -25,9 +25,10 @@ public final class RadioManager : NSObject {
   private var _radioPickerViewController    : RadioPickerViewController?
   private var _wanManager                   : WanManager?
 
-  
+  private lazy var _radioMenu = NSApplication.shared.mainMenu?.item(withTitle: "Radio")
+
   // ----------------------------------------------------------------------------
-  // MARK: -Initialization
+  // MARK: Initialization
   
   init(delegate: WanManagerDelegate?) {
     super.init()
@@ -43,6 +44,7 @@ public final class RadioManager : NSObject {
     // start Discovery
     let _ = Discovery.sharedInstance
     
+    _radioMenu?.item(title: "SmartLink enabled")?.boolState = Defaults.smartLinkEnabled
     if Defaults.smartLinkEnabled {
       // only log in if we were logged in previously
       if Defaults.smartLinkWasLoggedIn {
@@ -54,7 +56,10 @@ public final class RadioManager : NSObject {
     
     addNotifications()
   }
-    
+
+  // ----------------------------------------------------------------------------
+  // MARK: Internal methods
+  
   func smartLinkLogin() {
     // instantiate the WanManager
     _wanManager = WanManager(delegate: _delegate)
@@ -93,45 +98,14 @@ public final class RadioManager : NSObject {
   func testWanConnection(_ packet: DiscoveryPacket) {
     _wanManager?.testConnection(packet)
   }
-
-
-  // ----------------------------------------------------------------------------
-  // MARK: - Private methods
-  
-  
-//  private func scheduleSupportingApps() {
-//    
-//    Defaults.supportingApps.forEach({
-//      
-//      // if the app is enabled
-//      if ($0[InfoPrefsViewController.kEnabled] as! Bool) {
-//        
-//        // get the App name
-//        let appName = ($0[InfoPrefsViewController.kAppName] as! String)
-//        
-//        // get the startup delay (ms)
-//        let delay = ($0[InfoPrefsViewController.kDelay] as! Bool) ? $0[InfoPrefsViewController.kInterval] as! Int : 0
-//        
-//        // get the Cmd Line parameters
-//        //        let parameters = $0[InfoPrefsViewController.kParameters] as! String
-//        
-//        // schedule the launch
-//        _log("\(appName) launched with delay of \(delay)", .info,  #function, #file, #line)
-//        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + .seconds( delay )) {
-//          
-//          // TODO: Add Parameters
-//          NSWorkspace.shared.launchApplication(appName)
-//        }
-//      }
-//    })
-//  }
   /// Connect the selected Radio
   ///
   /// - Parameters:
   ///   - packet:               the DiscoveryPacket for the desired radio
   ///   - pendingDisconnect:    type, if any
+  /// - Returns:                success / failure
   ///
-  func connectRadio(_ packet: DiscoveryPacket?, pendingDisconnect: Api.PendingDisconnect = .none) -> Bool {
+  func connectRadio(_ packet: DiscoveryPacket?, isGui: Bool = true, pendingDisconnect: Api.PendingDisconnect = .none) -> Bool {
     
     // exit if no Radio selected
     guard let packet = packet else { return false }
@@ -141,10 +115,14 @@ public final class RadioManager : NSObject {
                         station           : Logger.kAppName,
                         program           : Logger.kAppName,
                         clientId          : _clientId,
-                        isGui             : true,
+                        isGui             : isGui,
                         wanHandle         : packet.wanHandle,
                         pendingDisconnect : pendingDisconnect)
   }
+
+  // ----------------------------------------------------------------------------
+  // MARK: - Private methods
+
   /// Produce a Client Id (UUID)
   ///
   /// - Returns:                a UUID

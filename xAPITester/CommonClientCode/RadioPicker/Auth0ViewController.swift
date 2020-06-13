@@ -128,10 +128,6 @@ final class Auth0ViewController             : NSViewController, WKNavigationDele
   // ----------------------------------------------------------------------------
   // MARK: - Action methods
   
-  /// Respond to the Cancel button
-  ///
-  /// - Parameter sender:         the button
-  ///
   @IBAction func cancelButton(_ sender: Any) {
     DispatchQueue.main.async { [weak self] in
       self?.dismiss(self)

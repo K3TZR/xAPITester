@@ -50,7 +50,7 @@ final class RadioPickerViewController : NSViewController, NSTableViewDelegate, N
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public weak var delegate                    : ViewController?
+  public weak var delegate                    : RadioPickerDelegate?
   
   @IBOutlet public weak var testIndicator     : NSButton!
 
@@ -80,7 +80,7 @@ final class RadioPickerViewController : NSViewController, NSTableViewDelegate, N
   ///
   override func viewDidLoad() {
     super.viewDidLoad()
-        
+
     // setup Right Single Click recognizer
     _rightClick = NSClickGestureRecognizer(target: self, action: #selector(rightClick(_:)))
     _rightClick.buttonMask = 0x02
@@ -221,9 +221,10 @@ final class RadioPickerViewController : NSViewController, NSTableViewDelegate, N
   /// Add observations of various properties
   ///
   private func addObservations() {
-    
+
+    let object = delegate as! ViewController
     _observations = [
-      delegate!.observe(\.smartLinkUser, options: [.initial, .new]) { [weak self] (object, change) in
+      object.observe(\.smartLinkUser, options: [.initial, .new]) { [weak self] (object, change) in
         DispatchQueue.main.async {
           self?._nameLabel.stringValue = object.smartLinkUser ?? ""
           if object.smartLinkEnabled {
@@ -232,7 +233,7 @@ final class RadioPickerViewController : NSViewController, NSTableViewDelegate, N
             self?._loginButton.title = "Disabled"
           }
         }},
-      delegate!.observe(\.smartLinkCall, options: [.initial, .new]) { [weak self] (object, change) in
+      object.observe(\.smartLinkCall, options: [.initial, .new]) { [weak self] (object, change) in
         DispatchQueue.main.async {
           if object.smartLinkEnabled {
             self?._callLabel.stringValue = object.smartLinkCall ?? ""
@@ -240,7 +241,7 @@ final class RadioPickerViewController : NSViewController, NSTableViewDelegate, N
             self?._callLabel.stringValue = ""
           }
         }},
-      delegate!.observe(\.smartLinkImage, options: [.initial, .new]) { [weak self] (object, change) in
+      object.observe(\.smartLinkImage, options: [.initial, .new]) { [weak self] (object, change) in
         DispatchQueue.main.async {
           if object.smartLinkEnabled {
             self?._logonImage.image = object.smartLinkImage
