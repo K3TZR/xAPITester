@@ -476,7 +476,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 1.1.9;
+				MARKETING_VERSION = 1.1.10;
 				PRODUCT_BUNDLE_IDENTIFIER = net.k3tzr.xAPITester;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -508,7 +508,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 1.1.9;
+				MARKETING_VERSION = 1.1.10;
 				PRODUCT_BUNDLE_IDENTIFIER = net.k3tzr.xAPITester;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -546,7 +546,7 @@
 			repositoryURL = "https://github.com/K3TZR/xLib6000.git";
 			requirement = {
 				kind = exactVersion;
-				version = 1.3.3;
+				version = 1.3.5;
 			};
 		};
 		917AAA8323D5EDC80082FAEB /* XCRemoteSwiftPackageReference "XCGLogger" */ = {

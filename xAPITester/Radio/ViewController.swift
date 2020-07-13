@@ -684,7 +684,7 @@ public final class ViewController: NSViewController, NSTextFieldDelegate, WanMan
             // close the connected Radio if the YES button pressed
             
             switch response {
-            case NSApplication.ModalResponse.alertFirstButtonReturn:  self._api.disconnectClient( packet: discoveryPacket, handle: handles[0])
+            case NSApplication.ModalResponse.alertFirstButtonReturn:  self._api.requestClientDisconnect( packet: discoveryPacket, handle: handles[0])
             case NSApplication.ModalResponse.alertSecondButtonReturn: self.disconnectApplication()
             default:  break
             }
@@ -717,8 +717,8 @@ public final class ViewController: NSViewController, NSTextFieldDelegate, WanMan
         alert.beginSheetModal(for: NSApplication.shared.mainWindow!, completionHandler: { (response) in
           
           switch response {
-          case NSApplication.ModalResponse.alertFirstButtonReturn:  self._api.disconnectClient( packet: discoveryPacket, handle: handles[0])
-          case NSApplication.ModalResponse.alertSecondButtonReturn: self._api.disconnectClient( packet: discoveryPacket, handle: handles[1])
+          case NSApplication.ModalResponse.alertFirstButtonReturn:  self._api.requestClientDisconnect( packet: discoveryPacket, handle: handles[0])
+          case NSApplication.ModalResponse.alertSecondButtonReturn: self._api.requestClientDisconnect( packet: discoveryPacket, handle: handles[1])
           case NSApplication.ModalResponse.alertThirdButtonReturn:  self.disconnectApplication()
           default:  break
           }

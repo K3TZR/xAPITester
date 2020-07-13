@@ -73,6 +73,11 @@ If you require a Mac-based Voice Keyer , please see.
 
 [![W6OP](https://img.shields.io/badge/W6OP-Voice_Keyer-informational)](https://w6op.com)
 
+## 1.1.10 Release Notes
+
+* uses xLIb6000 v1.3.5
+* updates to RadioManager & RadioPickerViewController to match those in xSDR6000
+
 
 ## 1.1.9 Release Notes
 
