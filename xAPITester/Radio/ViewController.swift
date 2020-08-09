@@ -553,7 +553,7 @@ public final class ViewController: NSViewController, NSTextFieldDelegate, WanMan
     switch (isNewApi, status, guiCount) {
       
     case (false, kAvailable, _):          // oldApi, not connected to another client
-      _ = _radioManager.connectRadio(packet, isGui: Defaults.isGui) ; updateButtonStates()
+      _radioManager.connectRadio(packet, isGui: Defaults.isGui) ; updateButtonStates()
       
     case (false, kInUse, _):              // oldApi, connected to another client
       DispatchQueue.main.async {
@@ -570,7 +570,7 @@ public final class ViewController: NSViewController, NSTextFieldDelegate, WanMan
           
           switch response {
           case NSApplication.ModalResponse.alertFirstButtonReturn:
-            _ = self._radioManager.connectRadio(packet, isGui: Defaults.isGui, pendingDisconnect: .oldApi) ; self.updateButtonStates()
+            self._radioManager.connectRadio(packet, isGui: Defaults.isGui, pendingDisconnect: .oldApi) ; self.updateButtonStates()
             sleep(1)
             self._api.disconnect()
             sleep(1)
@@ -582,7 +582,7 @@ public final class ViewController: NSViewController, NSTextFieldDelegate, WanMan
         })}
       
     case (true, kAvailable, 0):           // newApi, not connected to another client
-      _ = _radioManager.connectRadio(packet, isGui: Defaults.isGui) ; self.updateButtonStates()
+      _radioManager.connectRadio(packet, isGui: Defaults.isGui) ; self.updateButtonStates()
       
     case (true, kAvailable, _):           // newApi, connected to another client
       DispatchQueue.main.async {
@@ -600,9 +600,9 @@ public final class ViewController: NSViewController, NSTextFieldDelegate, WanMan
           
           switch response {
           case NSApplication.ModalResponse.alertFirstButtonReturn:
-            _ = self._radioManager.connectRadio(packet, isGui: Defaults.isGui, pendingDisconnect: .newApi(handle: handles[0])) ; self.updateButtonStates()
+            self._radioManager.connectRadio(packet, isGui: Defaults.isGui, pendingDisconnect: .newApi(handle: handles[0])) ; self.updateButtonStates()
           case NSApplication.ModalResponse.alertSecondButtonReturn:
-            _ = self._radioManager.connectRadio(packet, isGui: Defaults.isGui )  ; self.updateButtonStates()
+            self._radioManager.connectRadio(packet, isGui: Defaults.isGui )  ; self.updateButtonStates()
           default:  break
           }
         })}
@@ -625,11 +625,11 @@ public final class ViewController: NSViewController, NSTextFieldDelegate, WanMan
           
           switch response {
           case NSApplication.ModalResponse.alertFirstButtonReturn:
-            _ =  self._radioManager.connectRadio(packet, isGui: Defaults.isGui, pendingDisconnect: .newApi(handle: handles[0]))  ; self.updateButtonStates()
+            self._radioManager.connectRadio(packet, isGui: Defaults.isGui, pendingDisconnect: .newApi(handle: handles[0]))  ; self.updateButtonStates()
           case NSApplication.ModalResponse.alertSecondButtonReturn:
-            _ = self._radioManager.connectRadio(packet, isGui: Defaults.isGui, pendingDisconnect: .newApi(handle: handles[1]))  ; self.updateButtonStates()
+            self._radioManager.connectRadio(packet, isGui: Defaults.isGui, pendingDisconnect: .newApi(handle: handles[1]))  ; self.updateButtonStates()
           case NSApplication.ModalResponse.alertThirdButtonReturn:
-            _ = self._radioManager.connectRadio(packet, isGui: false)  ; self.updateButtonStates()
+            self._radioManager.connectRadio(packet, isGui: false)  ; self.updateButtonStates()
           default:  break
           }
         })}
